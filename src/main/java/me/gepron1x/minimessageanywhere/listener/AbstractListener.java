@@ -1,4 +1,4 @@
-package me.gepron1x.minimessageanywhere.processors;
+package me.gepron1x.minimessageanywhere.listener;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;

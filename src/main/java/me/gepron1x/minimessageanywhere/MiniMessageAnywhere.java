@@ -4,7 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 
-import me.gepron1x.minimessageanywhere.processors.*;
+import me.gepron1x.minimessageanywhere.listener.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
