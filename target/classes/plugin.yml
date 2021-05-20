@@ -1,0 +1,7 @@
+name: MiniMessageAnywhere
+version: 1.0-SNAPSHOT
+main: me.gepron1x.minimessageanywhere.MiniMessageAnywhere
+depend: [ ProtocolLib ]
+authors: [ gepron1x ]
+description: use minimessage formatting anywhere!
+

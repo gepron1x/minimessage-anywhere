@@ -1,0 +1,11 @@
+name: MiniMessageAnywhere
+version: ${project.version}
+main: me.gepron1x.minimessageanywhere.MiniMessageAnywhere
+depend: [ ProtocolLib ]
+authors: [ gepron1x ]
+description: use minimessage formatting anywhere!
+commands:
+  mmanywhere:
+    permission: mmanywhere.reload
+    description: reloads configuration.
+
