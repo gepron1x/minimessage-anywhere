@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: net.kyori:adventure-platform-bukkit:4.0.0-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/net/kyori/adventure-platform-bukkit/4.0.0-SNAPSHOT/adventure-platform-bukkit-4.0.0-20210515.025052-75.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/net/kyori/adventure-platform-bukkit/4.0.0-SNAPSHOT/adventure-platform-bukkit-4.0.0-20210523.075428-76.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/net/kyori/adventure-platform-bukkit/4.0.0-SNAPSHOT/adventure-platform-bukkit-4.0.0-20210515.025052-75-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/net/kyori/adventure-platform-bukkit/4.0.0-SNAPSHOT/adventure-platform-bukkit-4.0.0-20210523.075428-76-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/net/kyori/adventure-platform-bukkit/4.0.0-SNAPSHOT/adventure-platform-bukkit-4.0.0-20210515.025052-75-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/net/kyori/adventure-platform-bukkit/4.0.0-SNAPSHOT/adventure-platform-bukkit-4.0.0-20210523.075428-76-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

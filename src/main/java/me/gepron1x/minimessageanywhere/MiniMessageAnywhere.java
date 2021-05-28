@@ -53,9 +53,12 @@ public final class MiniMessageAnywhere extends JavaPlugin {
             protocolManager.addPacketListener(new MapListener(this));
         if(getConfig().getBoolean("player-info-enabled"))
             protocolManager.addPacketListener(new PlayerInfoListener(this));
+        if(getConfig().getBoolean("server-motd-enabled"))
+            protocolManager.addPacketListener(new ServerPingListener(this));
 
 
     }
+
     public ComponentProcessor getComponentProcessor() {
         return componentProcessor;
     }

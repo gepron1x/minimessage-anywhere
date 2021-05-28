@@ -24,5 +24,7 @@ public abstract class AbstractListener extends PacketAdapter {
 
     @Override
     public abstract void onPacketSending(PacketEvent event);
+    @Override
+    public void onPacketReceiving(PacketEvent event) {}
 }
 
