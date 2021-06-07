@@ -1,4 +1,4 @@
-package me.gepron1x.minimessageanywhere.listener;
+package me.gepron1x.minimessageanywhere.packetlistener.out;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
@@ -17,5 +17,6 @@ public class ServerPingListener extends AbstractListener {
         WrappedServerPing ping = packet.getServerPings().read(0);
         ping.setMotD(componentProcessor.handle(ping.getMotD()));
         packet.getServerPings().write(0, ping);
+        event.setPacket(packet);
     }
 }

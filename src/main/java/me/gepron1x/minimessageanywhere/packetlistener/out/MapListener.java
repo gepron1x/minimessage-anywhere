@@ -1,4 +1,4 @@
-package me.gepron1x.minimessageanywhere.listener;
+package me.gepron1x.minimessageanywhere.packetlistener.out;
 
 
 import com.comphenix.protocol.PacketType;
@@ -20,7 +20,7 @@ public class MapListener extends AbstractListener {
     public void onPacketSending(final PacketEvent event) {
         WrapperPlayServerMap mapPacket = new WrapperPlayServerMap(event.getPacket());
         mapPacket.setMapIcons(Arrays.stream(mapPacket.getMapIcons())
-                .peek(icon -> icon.name = componentProcessor.handle(icon.name))
+                .peek(icon -> icon.name = icon.name == null ? null : componentProcessor.handle(icon.name))
                 .toArray(WrapperPlayServerMap.MapIcon[]::new));
         event.setPacket(mapPacket.getHandle());
     }

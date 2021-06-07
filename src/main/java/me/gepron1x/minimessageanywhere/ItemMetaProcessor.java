@@ -4,6 +4,7 @@ import me.gepron1x.minimessageanywhere.pdc.DataType;
 import me.gepron1x.minimessageanywhere.util.PacketBookData;
 import me.gepron1x.minimessageanywhere.util.PacketItemData;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.meta.BookMeta;
@@ -17,6 +18,8 @@ public class ItemMetaProcessor implements Processor<ItemMeta> {
     private final ComponentProcessor componentProcessor;
     private static final NamespacedKey BOOK_DATA = NamespacedKey.minecraft("book_data");
     private static final NamespacedKey ITEM_DATA = NamespacedKey.minecraft("item_data");
+    private final Component fuckItalic = Component.empty().decoration(TextDecoration.ITALIC, false);
+
 
     public ItemMetaProcessor(ComponentProcessor componentProcessor) {
         this.componentProcessor = componentProcessor;
@@ -26,11 +29,13 @@ public class ItemMetaProcessor implements Processor<ItemMeta> {
     @Override
     public ItemMeta handle(ItemMeta meta) {
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        container.set(ITEM_DATA, DataType.ITEM_DATA, new PacketItemData(meta.displayName(), meta.lore()));
-        if(meta.hasDisplayName())
-            meta.displayName(componentProcessor.handle(meta.displayName()));
-        if(meta.hasLore())
-            meta.lore(meta.lore().stream().map(componentProcessor::handle).collect(Collectors.toList()));
+        Component displayName = meta.displayName();
+        List<Component> lore = meta.lore();
+        container.set(ITEM_DATA, DataType.ITEM_DATA, new PacketItemData(displayName, lore));
+        if(displayName != null)
+            meta.displayName(fuckItalic.append(componentProcessor.handle(displayName)));
+        if(lore != null)
+            meta.lore(lore.stream().map(componentProcessor::handle).map(fuckItalic::append).collect(Collectors.toList()));
         if(meta instanceof BookMeta) {
             BookMeta bookMeta = (BookMeta) meta;
             Component author = bookMeta.author() == null ? null : componentProcessor.handle(bookMeta.author());

@@ -16,6 +16,7 @@ public class ComponentCollectionDataType<C extends Collection<Component>> implem
     @SuppressWarnings("unchecked")
     private final Class<C> complex = (Class<C>) new TypeToken<C>(){}.getRawType();
     private final Supplier<C> collectionFactory;
+    private final JsonParser jsonParser = new JsonParser();
     private final GsonComponentSerializer gson = GsonComponentSerializer.gson();
 
     public ComponentCollectionDataType(Supplier<C> collectionFactory) {
@@ -41,9 +42,9 @@ public class ComponentCollectionDataType<C extends Collection<Component>> implem
 
     @Override
     public @NotNull C fromPrimitive(@NotNull String primitive, @NotNull PersistentDataAdapterContext context) {
-        JsonParser parser = new JsonParser();
         final C collection = collectionFactory.get();
-        parser.parse(primitive).getAsJsonArray().forEach(element -> collection.add(gson.deserializeFromTree(element)));
+        jsonParser.parse(primitive).getAsJsonArray()
+                .forEach(element -> collection.add(gson.deserializeFromTree(element)));
         return collection;
     }
 

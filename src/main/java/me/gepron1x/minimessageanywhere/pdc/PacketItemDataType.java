@@ -26,7 +26,6 @@ public class PacketItemDataType implements PersistentDataType<PersistentDataCont
         PersistentDataContainer container = context.newPersistentDataContainer();
         if(complex.hasDisplayName()) container.set(DISPLAY_NAME_KEY, DataType.COMPONENT, complex.getDisplayName());
         if(complex.hasLore()) container.set(LORE_KEY, DataType.COMPONENT_LIST, complex.getLore());
-
         return container;
     }
 

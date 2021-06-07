@@ -13,8 +13,10 @@ import static me.gepron1x.minimessageanywhere.util.AdventureComponentConverter.*
 public class ComponentProcessor implements Processor<Component> {
     private final Pattern translatablePattern = Pattern.compile("\\[mm](.+)\\[/mm]");
     private final MiniMessage miniMessage = MiniMessage.get();
-    private final TextReplacementConfig textReplacementConfig = TextReplacementConfig.builder()
-            .match(translatablePattern).replacement((matchResult, builder) -> miniMessage.parse(matchResult.group(1))).build();
+    private final TextReplacementConfig textReplacementConfig =
+            TextReplacementConfig.builder()
+            .match(translatablePattern)
+            .replacement((matchResult, builder) -> miniMessage.parse(matchResult.group(1))).build();
     @Override
     public Component handle(Component input) {
         return input.replaceText(textReplacementConfig);
