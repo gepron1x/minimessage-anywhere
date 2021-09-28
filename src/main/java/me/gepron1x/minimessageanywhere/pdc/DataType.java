@@ -7,8 +7,7 @@ import java.util.List;
 public final class DataType {
     private DataType() {}
     public static final ComponentDataType COMPONENT = new ComponentDataType();
-    public static final ComponentCollectionDataType<List<Component>> COMPONENT_LIST
-            = new ComponentCollectionDataType<>(ArrayList::new);
+    public static final ComponentListDataType<List<Component>> COMPONENT_LIST = new ComponentListDataType<>();
     public static final PacketItemDataType ITEM_DATA = new PacketItemDataType();
     public static final PacketBookDataType BOOK_DATA = new PacketBookDataType();
 

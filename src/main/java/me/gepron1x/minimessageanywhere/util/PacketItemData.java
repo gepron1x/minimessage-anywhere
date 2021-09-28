@@ -19,6 +19,9 @@ public final class PacketItemData {
     public boolean hasDisplayName() {
         return displayName != null;
     }
+    public boolean isEmpty() {
+        return !hasLore() && hasDisplayName();
+    }
     @Nullable
     public Component getDisplayName() {
         return displayName;

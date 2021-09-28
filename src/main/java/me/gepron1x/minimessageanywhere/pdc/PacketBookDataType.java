@@ -1,11 +1,14 @@
 package me.gepron1x.minimessageanywhere.pdc;
 
 import me.gepron1x.minimessageanywhere.util.PacketBookData;
+import net.kyori.adventure.text.Component;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataAdapterContext;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class PacketBookDataType implements PersistentDataType<PersistentDataContainer, PacketBookData> {
 
@@ -25,8 +28,10 @@ public class PacketBookDataType implements PersistentDataType<PersistentDataCont
     @Override
     public @NotNull PersistentDataContainer toPrimitive(@NotNull PacketBookData complex, @NotNull PersistentDataAdapterContext context) {
         PersistentDataContainer container = context.newPersistentDataContainer();
-        if(complex.hasAuthor()) container.set(AUTHOR_KEY, DataType.COMPONENT, complex.getAuthor());
-        if(complex.hasTitle()) container.set(TITLE_KEY, DataType.COMPONENT, complex.getTitle());
+        Component author = complex.getAuthor();
+        Component title = complex.getTitle();
+        if(author != null) container.set(AUTHOR_KEY, DataType.COMPONENT, author);
+        if(title != null) container.set(TITLE_KEY, DataType.COMPONENT, title);
         container.set(PAGES_KEY, DataType.COMPONENT_LIST, complex.getPages());
         return container;
     }
@@ -36,7 +41,7 @@ public class PacketBookDataType implements PersistentDataType<PersistentDataCont
         return new PacketBookData(
                 primitive.get(AUTHOR_KEY, DataType.COMPONENT),
                 primitive.get(TITLE_KEY, DataType.COMPONENT),
-                primitive.get(PAGES_KEY, DataType.COMPONENT_LIST)
+                Objects.requireNonNull(primitive.get(PAGES_KEY, DataType.COMPONENT_LIST), "pages cannot be null")
         );
     }
 }

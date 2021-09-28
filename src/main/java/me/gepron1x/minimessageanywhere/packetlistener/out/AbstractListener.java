@@ -1,26 +1,32 @@
 package me.gepron1x.minimessageanywhere.packetlistener.out;
 
 import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import me.gepron1x.minimessageanywhere.ComponentProcessor;
+import me.gepron1x.minimessageanywhere.ComponentHandler;
 import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
+import me.gepron1x.minimessageanywhere.util.ProtocolLibraryComponentSerializer;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 public abstract class AbstractListener extends PacketAdapter {
     protected final MiniMessageAnywhere plugin;
-    protected final ComponentProcessor componentProcessor;
+    protected final ComponentHandler handler;
 
-    public AbstractListener(MiniMessageAnywhere plugin, PacketType... types) {
-        super(plugin, ListenerPriority.HIGHEST, types);
+    public AbstractListener(MiniMessageAnywhere plugin, ComponentHandler handler, PacketType... types) {
+        this(plugin, handler, Arrays.asList(types));
+
+    }
+    public AbstractListener(MiniMessageAnywhere plugin, ComponentHandler handler, Collection<PacketType> types) {
+        super(plugin, types);
         this.plugin = plugin;
-        this.componentProcessor = plugin.getComponentProcessor();
+        this.handler = handler;
     }
-    public AbstractListener(MiniMessageAnywhere plugin, Collection<PacketType> types) {
-        this(plugin, types.toArray(types.toArray(new PacketType[0])));
-    }
+
+
+
+
 
     @Override
     public abstract void onPacketSending(PacketEvent event);
