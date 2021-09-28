@@ -2,8 +2,6 @@ name: MiniMessageAnywhere
 version: ${project.version}
 main: me.gepron1x.minimessageanywhere.MiniMessageAnywhere
 depend: [ ProtocolLib ]
-softdepend:
-  - PlaceholderAPI
 authors: [ gepron1x ]
 api-version: 1.16
 description: use minimessage formatting anywhere!

@@ -1,16 +1,15 @@
 package me.gepron1x.minimessageanywhere.config;
 
 import com.comphenix.protocol.PacketType;
-import net.kyori.adventure.text.Component;
+import me.gepron1x.minimessageanywhere.util.Message;
 import space.arim.dazzleconf.annote.ConfComments;
 import space.arim.dazzleconf.annote.ConfKey;
 import space.arim.dazzleconf.annote.SubSection;
 
 import java.util.Collection;
-import java.util.Map;
 
 import static space.arim.dazzleconf.annote.ConfDefault.*;
-import static space.arim.dazzleconf.sorter.AnnotationBasedSorter.*;
+import static space.arim.dazzleconf.sorter.AnnotationBasedSorter.Order;
 
 public interface Config {
     @Order(1)
@@ -105,19 +104,19 @@ public interface Config {
 
         @ConfKey("info")
         @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> v 2.0")
-        Component info();
+        Message info();
 
         @ConfKey("no-permission")
         @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> <#e60000>У вас нету права на это!")
-        Component noPermission();
+        Message noPermission();
 
         @ConfKey("reloaded")
         @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> Плагин успешно перезагружен!")
-        Component reloaded();
+        Message reloaded();
 
         @ConfKey("unknown-command")
         @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> Неизвестная команда!")
-        Component unknownCommand();
+        Message unknownCommand();
 
     }
 

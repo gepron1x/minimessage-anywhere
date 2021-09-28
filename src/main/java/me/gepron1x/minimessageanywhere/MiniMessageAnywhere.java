@@ -9,18 +9,13 @@ import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-
-import com.google.common.collect.ImmutableList;
 import me.gepron1x.minimessageanywhere.config.Config;
 import me.gepron1x.minimessageanywhere.config.ConfigManager;
 import me.gepron1x.minimessageanywhere.config.ParsingStrategy;
-import me.gepron1x.minimessageanywhere.config.serializer.ComponentValueSerializer;
+import me.gepron1x.minimessageanywhere.config.serializer.MessageSerializer;
 import me.gepron1x.minimessageanywhere.config.serializer.PacketTypeSerializer;
-import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.handler.GlobalComponentHandler;
 import me.gepron1x.minimessageanywhere.handler.MiniMessageComponentHandler;
-import me.gepron1x.minimessageanywhere.hook.PlaceholderAPISupport;
-import me.gepron1x.minimessageanywhere.hook.PlaceholderAPISupportImpl;
 import me.gepron1x.minimessageanywhere.listener.PrettyChatListener;
 import me.gepron1x.minimessageanywhere.packetlistener.in.ChatFilter;
 import me.gepron1x.minimessageanywhere.packetlistener.out.*;
@@ -37,7 +32,9 @@ import space.arim.dazzleconf.ConfigurationOptions;
 import space.arim.dazzleconf.sorter.AnnotationBasedSorter;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -72,7 +69,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
         handler = new GlobalComponentHandler();
         ConfigurationOptions options = new ConfigurationOptions.Builder()
                 .addSerialiser(new PacketTypeSerializer())
-                .addSerialiser(new ComponentValueSerializer(miniMessage))
+                .addSerialiser(new MessageSerializer(miniMessage))
                 .sorter(new AnnotationBasedSorter())
                 .build();
         configManager = ConfigManager.create(getDataFolder().toPath(), "config.yml", Config.class, options);

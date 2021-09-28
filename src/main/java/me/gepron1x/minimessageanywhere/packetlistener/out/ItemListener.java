@@ -3,8 +3,8 @@ package me.gepron1x.minimessageanywhere.packetlistener.out;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
+import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.pdc.DataType;
 import me.gepron1x.minimessageanywhere.util.PacketBookData;
 import me.gepron1x.minimessageanywhere.util.PacketItemData;
@@ -54,11 +54,11 @@ public class ItemListener extends AbstractListener {
             Component title = displayNameHandled == null ? bookMeta.title() : displayNameHandled;
             Component author = bookMeta.author();
             pdc.set(bookDataKey, DataType.BOOK_DATA, new PacketBookData(author, title, pages));
-            meta = bookMeta.toBuilder()
-                    .title(handler.handleIfNotNull(audience, title))
-                    .author(handler.handleIfNotNull(audience, author))
-                    .pages(processList(audience, pages))
-                    .build();
+            bookMeta.title(handler.handleIfNotNull(audience, title));
+            bookMeta.author(handler.handleIfNotNull(audience, author));
+            for (int i = 1; i <= bookMeta.getPageCount(); i++) {
+                bookMeta.page(i, handler.handle(audience, bookMeta.page(i)));
+            }
         }
 
 
@@ -91,16 +91,19 @@ public class ItemListener extends AbstractListener {
             displayName = itemData.getDisplayName();
             meta.displayName(displayName);
             meta.lore(itemData.getLore());
+
+            pdc.remove(itemDataKey);
         }
 
 
         PacketBookData bookData = pdc.get(bookDataKey, DataType.BOOK_DATA);
         if(itemStack.getType() == Material.WRITTEN_BOOK && bookData != null) {
-            meta = ((BookMeta) meta).toBuilder()
-                    .title(bookData.getTitle())
-                    .author(bookData.getAuthor())
-                    .pages(bookData.getPages())
-                    .build();
+            BookMeta book = (BookMeta) meta;
+            book.pages(bookData.getPages());
+            book.author(bookData.getAuthor());
+            book.title(bookData.getTitle());
+
+            pdc.remove(bookDataKey);
         }
 
         itemStack.setItemMeta(meta);
