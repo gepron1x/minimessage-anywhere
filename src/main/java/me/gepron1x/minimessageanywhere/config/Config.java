@@ -77,24 +77,28 @@ public interface Config {
     }
 
     @Order(5)
-    @ConfComments("Фильтр чата. Игроки без права minimessage.ignore не смогут использовать minimessage в чате.")
+    @ConfComments("Фильтр чата. Игроки без права mmanywhere.ignore не смогут использовать minimessage в чате.")
     @ConfKey("filter-chat")
-    @DefaultBoolean(false) boolean filterChat();
+    @SubSection Filter filter();
+
+    interface Filter {
+
+        @ConfKey("enabled")
+        @DefaultBoolean(false) boolean enabled();
+
+        @ConfComments("Замена тега, если такой найдется. <red> -> <>")
+        @ConfKey("replacement")
+        @DefaultString("<>") String replacement();
+
+    }
 
     @Order(6)
     @ConfComments("Красивый чат для консоли.")
     @ConfKey("pretty-chat")
     @DefaultBoolean(true) boolean prettyChat();
 
-    @Order(7)
-    @ConfComments({"Сделанные для вашего удобства плейсхолдеры. Они будут автоматически заменятся на указанные значения во время обработки.",
-            "Например: <hello>: Привет!",
-            "PAPI поддерживается."
-    })
-    @DefaultMap({"hello", "Привет, %player_name%"})
-    Map<String, String> placeholders();
 
-    @Order(8)
+    @Order(7)
     @ConfKey("messages")
     @SubSection Messages messages();
     interface Messages {

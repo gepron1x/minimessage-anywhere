@@ -9,8 +9,8 @@ import java.util.List;
 public class DefaultMiniMessageProcessor implements MiniMessageProcessor {
 
     @Override
-    public Component process(MiniMessage miniMessage, Component component, List<Template> templates) {
+    public Component process(MiniMessage miniMessage, Component component) {
         String serialized = miniMessage.serialize(component);
-        return miniMessage.parse(serialized, templates);
+        return miniMessage.parse(serialized);
     }
 }

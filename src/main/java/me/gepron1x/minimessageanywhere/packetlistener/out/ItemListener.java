@@ -3,7 +3,7 @@ package me.gepron1x.minimessageanywhere.packetlistener.out;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import me.gepron1x.minimessageanywhere.ComponentHandler;
+import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
 import me.gepron1x.minimessageanywhere.pdc.DataType;
 import me.gepron1x.minimessageanywhere.util.PacketBookData;
@@ -48,10 +48,10 @@ public class ItemListener extends AbstractListener {
         meta.displayName(displayNameHandled);
         meta.lore(lore == null ? null : processList(audience, lore));
 
-        /* if(itemStack.getType() == Material.WRITTEN_BOOK) {
+        if(itemStack.getType() == Material.WRITTEN_BOOK) {
             BookMeta bookMeta = (BookMeta) meta;
             List<Component> pages = bookMeta.pages();
-            Component title = bookMeta.title();
+            Component title = displayNameHandled == null ? bookMeta.title() : displayNameHandled;
             Component author = bookMeta.author();
             pdc.set(bookDataKey, DataType.BOOK_DATA, new PacketBookData(author, title, pages));
             meta = bookMeta.toBuilder()
@@ -59,8 +59,7 @@ public class ItemListener extends AbstractListener {
                     .author(handler.handleIfNotNull(audience, author))
                     .pages(processList(audience, pages))
                     .build();
-        } */
-
+        }
 
 
         itemStack.setItemMeta(meta);
@@ -94,7 +93,7 @@ public class ItemListener extends AbstractListener {
             meta.lore(itemData.getLore());
         }
 
-        /*
+
         PacketBookData bookData = pdc.get(bookDataKey, DataType.BOOK_DATA);
         if(itemStack.getType() == Material.WRITTEN_BOOK && bookData != null) {
             meta = ((BookMeta) meta).toBuilder()
@@ -102,7 +101,7 @@ public class ItemListener extends AbstractListener {
                     .author(bookData.getAuthor())
                     .pages(bookData.getPages())
                     .build();
-        } */
+        }
 
         itemStack.setItemMeta(meta);
         packet.getItemModifier().write(0, itemStack);

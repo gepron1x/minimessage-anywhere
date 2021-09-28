@@ -5,24 +5,30 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
+import net.kyori.adventure.text.minimessage.Tokens;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.List;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ChatFilter extends PacketAdapter {
-    private final UnaryOperator<String> filter;
+    private static final Pattern TAG = Pattern.compile("<(.+)>");
     private final Predicate<Player> ignore;
+    private final String replacement;
+    private final String[] tokens;
 
-    public ChatFilter(Plugin plugin, UnaryOperator<String> filter, Predicate<Player> ignore) {
+    public ChatFilter(Plugin plugin, String[] tokens, String replacement, Predicate<Player> ignore) {
         super(plugin, PacketType.Play.Client.CHAT);
-        this.filter = filter;
+        this.tokens = tokens;
         this.ignore = ignore;
-
+        this.replacement = replacement;
     }
-    public ChatFilter(Plugin plugin, UnaryOperator<String> filter) {
-        this(plugin, filter, player -> false);
+    public ChatFilter(Plugin plugin, String[] tokens, String replacement) {
+        this(plugin, tokens, replacement, player -> false);
     }
 
     @Override
@@ -31,7 +37,17 @@ public class ChatFilter extends PacketAdapter {
 
         PacketContainer packet = event.getPacket();
         StructureModifier<String> strings = packet.getStrings();
-        strings.write(0, filter.apply(strings.read(0)));
+        String message = strings.read(0);
+        Matcher matcher = TAG.matcher(message);
+        while(matcher.find()) {
+            String value = matcher.group(1);
+            String valueWrapped = Tokens.TAG_START + value + Tokens.TAG_END;
+            for(String token : tokens) {
+                if(value.startsWith(token)) message = StringUtils.replace(message, valueWrapped, replacement);
+            }
+
+        }
+        strings.write(0, message);
         event.setPacket(packet);
 
     }

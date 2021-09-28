@@ -2,7 +2,7 @@ package me.gepron1x.minimessageanywhere.listener;
 
 import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import me.gepron1x.minimessageanywhere.ComponentHandler;
+import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.Server;
 import org.bukkit.event.EventHandler;

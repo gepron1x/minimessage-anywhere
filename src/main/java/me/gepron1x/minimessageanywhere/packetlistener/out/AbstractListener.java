@@ -3,9 +3,8 @@ package me.gepron1x.minimessageanywhere.packetlistener.out;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import me.gepron1x.minimessageanywhere.ComponentHandler;
+import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
-import me.gepron1x.minimessageanywhere.util.ProtocolLibraryComponentSerializer;
 
 import java.util.Arrays;
 import java.util.Collection;

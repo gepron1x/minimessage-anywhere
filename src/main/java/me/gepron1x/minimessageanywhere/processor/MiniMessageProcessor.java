@@ -12,7 +12,7 @@ public interface MiniMessageProcessor {
     DefaultMiniMessageProcessor DEFAULT = new DefaultMiniMessageProcessor();
 
 
-    Component process(MiniMessage miniMessage, Component component, List<Template> templates);
+    Component process(MiniMessage miniMessage, Component component);
 
     static DefaultMiniMessageProcessor all() {
         return DEFAULT;

@@ -5,7 +5,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import me.gepron1x.minimessageanywhere.ComponentHandler;
+import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;

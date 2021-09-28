@@ -1,6 +1,5 @@
 package me.gepron1x.minimessageanywhere;
 
-import org.bukkit.permissions.Permission;
 
 public final class Permissions {
     private static final String PREFIX = "mmanywhere";
