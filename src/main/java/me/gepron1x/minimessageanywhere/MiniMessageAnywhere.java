@@ -20,7 +20,7 @@ import me.gepron1x.minimessageanywhere.listener.PrettyChatListener;
 import me.gepron1x.minimessageanywhere.packetlistener.in.ChatFilter;
 import me.gepron1x.minimessageanywhere.packetlistener.out.*;
 import me.gepron1x.minimessageanywhere.processor.MiniMessageProcessor;
-import me.gepron1x.minimessageanywhere.util.Patterns;
+import me.gepron1x.minimessageanywhere.util.RegexUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.Tokens;
 import org.bukkit.command.CommandSender;
@@ -126,8 +126,8 @@ public final class MiniMessageAnywhere extends JavaPlugin {
             processor = MiniMessageProcessor.all();
         } else {
             Config.Regex regexConfig = config.regex();
-            String prefix = Patterns.adaptUserInput(regexConfig.prefix());
-            String suffix = Patterns.adaptUserInput(regexConfig.suffix());
+            String prefix = RegexUtils.adaptUserInput(regexConfig.prefix());
+            String suffix = RegexUtils.adaptUserInput(regexConfig.suffix());
             Pattern pattern = Pattern.compile(MessageFormat.format("{0}(.+){1}", prefix, suffix));
             processor = MiniMessageProcessor.regex(pattern);
         }
@@ -179,9 +179,9 @@ public final class MiniMessageAnywhere extends JavaPlugin {
 
         commandManager.command(builder
                 .permission(Permissions.INFO)
-                .handler(ctx -> {
-            ctx.getSender().sendMessage(configManager.getConfigData().messages().info());
-        }));
+                .handler(ctx ->
+                        ctx.getSender().sendMessage(configManager.getConfigData().messages().info())
+                ));
         commandManager.command(builder.literal("reload")
                 .permission(Permissions.RELOAD)
                 .handler(ctx -> {
@@ -189,15 +189,15 @@ public final class MiniMessageAnywhere extends JavaPlugin {
                     ctx.getSender().sendMessage(configManager.getConfigData().messages().reloaded());
                 })
         );
-        commandManager.registerExceptionHandler(NoPermissionException.class, (sender, e) -> {
-            sender.sendMessage(configManager.getConfigData().messages().noPermission());
-        });
-        commandManager.registerExceptionHandler(NoSuchCommandException.class, (sender, e) -> {
-            sender.sendMessage(configManager.getConfigData().messages().unknownCommand());
-        });
-        commandManager.registerExceptionHandler(InvalidSyntaxException.class, (sender, e) -> {
-            sender.sendMessage(configManager.getConfigData().messages().unknownCommand());
-        });
+        commandManager.registerExceptionHandler(NoPermissionException.class,
+                (sender, e) -> sender.sendMessage(configManager.getConfigData().messages().noPermission())
+        );
+        commandManager.registerExceptionHandler(NoSuchCommandException.class,
+                (sender, e) -> sender.sendMessage(configManager.getConfigData().messages().unknownCommand())
+        );
+        commandManager.registerExceptionHandler(InvalidSyntaxException.class,
+                (sender, e) -> sender.sendMessage(configManager.getConfigData().messages().unknownCommand())
+        );
 
     }
 

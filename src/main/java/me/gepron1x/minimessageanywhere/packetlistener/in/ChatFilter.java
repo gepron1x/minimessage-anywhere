@@ -5,18 +5,16 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
-import net.kyori.adventure.text.minimessage.Tokens;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatFilter extends PacketAdapter {
-    private static final Pattern TAG = Pattern.compile("<(.+)>");
+    private static final Pattern TAG = Pattern.compile("(</?([#a-zA-Z\\d]+)>)");
     private final Predicate<Player> ignore;
     private final String replacement;
     private final String[] tokens;
@@ -33,6 +31,7 @@ public class ChatFilter extends PacketAdapter {
 
     @Override
     public void onPacketReceiving(PacketEvent event) {
+
         if(ignore.test(event.getPlayer())) return;
 
         PacketContainer packet = event.getPacket();
@@ -40,12 +39,11 @@ public class ChatFilter extends PacketAdapter {
         String message = strings.read(0);
         Matcher matcher = TAG.matcher(message);
         while(matcher.find()) {
-            String value = matcher.group(1);
-            String valueWrapped = Tokens.TAG_START + value + Tokens.TAG_END;
-            for(String token : tokens) {
-                if(value.startsWith(token)) message = StringUtils.replace(message, valueWrapped, replacement);
+            String target = matcher.group(1);
+            String value = matcher.group(2);
+            for (String token : tokens) {
+                if (value.startsWith(token)) message = StringUtils.replace(message, target, replacement);
             }
-
         }
         strings.write(0, message);
         event.setPacket(packet);

@@ -31,12 +31,14 @@ public final class Message implements ComponentLike {
     }
 
     public Message with(Collection<Template> templates) {
+        if (templates.isEmpty()) return this;
         ArrayList<Template> temp = new ArrayList<>(this.templates);
         temp.addAll(templates);
         return new Message(this.value, this.miniMessage, temp);
     }
 
     public Message with(Template... templates) {
+        if (templates.length == 0) return this;
         return with(Arrays.asList(templates));
     }
 
