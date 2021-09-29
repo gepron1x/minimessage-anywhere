@@ -142,19 +142,21 @@ public final class MiniMessageAnywhere extends JavaPlugin {
         listeners.add(new CommonListener(this, handler, config.packetsToListen()));
 
         Config.Specific specific = config.specific();
-        if(specific.items()){
-            listeners.add(new ItemListener(this, handler));
+        Config.Specific.Items items = specific.items();
+
+        if (items.enabled()) {
+            listeners.add(new ItemListener(this, handler, items.disableItalic()));
         }
-        if(specific.entities()) {
+        if (specific.entities()) {
             listeners.add(new EntityMetadataListener(this, handler));
         }
-        if(specific.mapIcons()) {
+        if (specific.mapIcons()) {
             listeners.add(new MapListener(this, handler));
         }
-        if(specific.playerInfo()) {
+        if (specific.playerInfo()) {
             listeners.add(new PlayerInfoListener(this, handler));
         }
-        if(specific.MoTD()) {
+        if (specific.MoTD()) {
             listeners.add(new ServerPingListener(this, handler));
         }
         listeners.forEach(protocolManager::addPacketListener);

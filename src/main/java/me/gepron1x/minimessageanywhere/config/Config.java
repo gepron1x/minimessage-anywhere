@@ -13,13 +13,12 @@ import static space.arim.dazzleconf.sorter.AnnotationBasedSorter.Order;
 
 public interface Config {
     @Order(1)
-    @ConfComments({"Пакеты, которые плагин будет обратывать плагин", "Не трогайте, если не знаете что делаете!"})
+    @ConfComments({"Пакеты, которые будет обрабатывать плагин", "Не трогайте, если не знаете что делаете!"})
     @DefaultStrings({
             "KICK_DISCONNECT",
             "BOSS",
             "CHAT",
             "OPEN_WINDOW",
-            "COMBAT_EVENT",
             "SCOREBOARD_OBJECTIVE",
             "SCOREBOARD_TEAM",
             "TITLE",
@@ -31,18 +30,37 @@ public interface Config {
     @Order(2)
     @ConfComments("специфичные пакеты, требующие индивидуальной обработки.")
     @SubSection Specific specific();
+
     interface Specific {
         @ConfComments("Обрабатывать предметы и книги?")
         @ConfKey("items")
-        @DefaultBoolean(true) boolean items();
+        @SubSection Items items();
+
+        interface Items {
+            @ConfComments("Обрабатывать предметы и книги?")
+            @ConfKey("enabled")
+            @DefaultBoolean(true)
+            boolean enabled();
+
+            @ConfComments({
+                    "Отключает декорацию italic в названии и лоре предмета.",
+                    "Не знаю как вам, но меня это подбешивает :)",
+                    "P.S если вам оно нужно - можете просто добавить тег <i>, эта функция лишь отключает дефолтный курсив ванильного майнкрафта."})
+            @ConfKey("disable-italic")
+            @DefaultBoolean(false)
+            boolean disableItalic();
+
+        }
 
         @ConfComments("Обрабатывать имена энтити?")
         @ConfKey("entities")
-        @DefaultBoolean(true) boolean entities();
+        @DefaultBoolean(true)
+        boolean entities();
 
         @ConfComments("Обрабатывать иконки на картах?")
         @ConfKey("map-icons")
-        @DefaultBoolean(true) boolean mapIcons();
+        @DefaultBoolean(true)
+        boolean mapIcons();
 
         @ConfComments("Обрабатывать имена игроков?")
         @ConfKey("player-info")

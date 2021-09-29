@@ -41,6 +41,8 @@ public class ChatFilter extends PacketAdapter {
         while(matcher.find()) {
             String target = matcher.group(1);
             String value = matcher.group(2);
+            plugin.getLogger().info(target);
+            plugin.getLogger().info(value);
             for (String token : tokens) {
                 if (value.startsWith(token)) message = StringUtils.replace(message, target, replacement);
             }

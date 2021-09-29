@@ -10,6 +10,7 @@ import me.gepron1x.minimessageanywhere.util.PacketBookData;
 import me.gepron1x.minimessageanywhere.util.PacketItemData;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -24,16 +25,28 @@ import java.util.List;
 
 
 public class ItemListener extends AbstractListener {
+
+    private static final ComponentHandler DISABLE_ITALIC = (audience, component) -> Component.text()
+            .decoration(TextDecoration.ITALIC, false)
+            .append(component).build();
+
+
     private final NamespacedKey itemDataKey, bookDataKey;
-    public ItemListener(MiniMessageAnywhere plugin, ComponentHandler handler) {
-        super(plugin, handler, PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS, PacketType.Play.Client.SET_CREATIVE_SLOT);
+
+
+    public ItemListener(MiniMessageAnywhere plugin, ComponentHandler handler, boolean disableItalic) {
+        super(plugin,
+                disableItalic ? handler.andThen(DISABLE_ITALIC) : handler,
+                PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS,
+                PacketType.Play.Client.SET_CREATIVE_SLOT
+        );
         this.itemDataKey = new NamespacedKey(plugin, "item_data");
         this.bookDataKey = new NamespacedKey(plugin, "book_data");
     }
 
-
+    
     private void processItem(Audience audience, @Nullable ItemStack itemStack) {
-        if(itemStack == null || !itemStack.hasItemMeta()) return;
+        if (itemStack == null || !itemStack.hasItemMeta()) return;
         ItemMeta meta = itemStack.getItemMeta();
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
@@ -43,10 +56,11 @@ public class ItemListener extends AbstractListener {
         Component displayNameHandled = handler.handleIfNotNull(audience, displayName);
         List<Component> lore = meta.lore();
         PacketItemData data = new PacketItemData(displayName, lore);
-        if(!data.isEmpty()) pdc.set(itemDataKey, DataType.ITEM_DATA, data);
+        pdc.set(itemDataKey, DataType.ITEM_DATA, data);
 
         meta.displayName(displayNameHandled);
         meta.lore(lore == null ? null : processList(audience, lore));
+
 
         if(itemStack.getType() == Material.WRITTEN_BOOK) {
             BookMeta bookMeta = (BookMeta) meta;
@@ -85,13 +99,10 @@ public class ItemListener extends AbstractListener {
 
 
         PacketItemData itemData = pdc.get(itemDataKey, DataType.ITEM_DATA);
-        Component displayName = null;
 
         if(itemData != null) {
-            displayName = itemData.getDisplayName();
-            meta.displayName(displayName);
+            meta.displayName(itemData.getDisplayName());
             meta.lore(itemData.getLore());
-
             pdc.remove(itemDataKey);
         }
 
