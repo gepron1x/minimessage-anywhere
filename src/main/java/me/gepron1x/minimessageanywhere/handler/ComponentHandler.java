@@ -7,6 +7,8 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * An interface that represents a component modifier. All components being sent by the server are being handled here.
@@ -62,5 +64,21 @@ public interface ComponentHandler {
             handlers.add(handler);
         }
         return new MappedComponentHandler(handlers);
+    }
+
+    static ComponentHandler allOf(Collection<ComponentHandler> handlers) {
+        ArrayList<ComponentHandler> temp = new ArrayList<>();
+        for (ComponentHandler handler : handlers) {
+            if (handler instanceof MappedComponentHandler) {
+                temp.addAll(((MappedComponentHandler) handler).getHandlers());
+            } else {
+                temp.add(handler);
+            }
+        }
+        return new MappedComponentHandler(temp);
+    }
+
+    static ComponentHandler allOf(ComponentHandler... handlers) {
+        return allOf(Arrays.asList(handlers));
     }
 }

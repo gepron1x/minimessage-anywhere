@@ -26,9 +26,9 @@ import java.util.List;
 
 public class ItemListener extends AbstractListener {
 
-    private static final ComponentHandler DISABLE_ITALIC = (audience, component) -> Component.text()
-            .decoration(TextDecoration.ITALIC, false)
-            .append(component).build();
+    private static final ComponentHandler DISABLE_ITALIC = (audience, component) -> component.decoration(TextDecoration.ITALIC, false);
+
+    private final ComponentHandler itemHandler;
 
 
     private final NamespacedKey itemDataKey, bookDataKey;
@@ -36,10 +36,11 @@ public class ItemListener extends AbstractListener {
 
     public ItemListener(MiniMessageAnywhere plugin, ComponentHandler handler, boolean disableItalic) {
         super(plugin,
-                disableItalic ? handler.andThen(DISABLE_ITALIC) : handler,
+                handler,
                 PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS,
                 PacketType.Play.Client.SET_CREATIVE_SLOT
         );
+        this.itemHandler = disableItalic ? handler.andThen(DISABLE_ITALIC) : handler;
         this.itemDataKey = new NamespacedKey(plugin, "item_data");
         this.bookDataKey = new NamespacedKey(plugin, "book_data");
     }
@@ -51,9 +52,8 @@ public class ItemListener extends AbstractListener {
         PersistentDataContainer pdc = meta.getPersistentDataContainer();
 
 
-
         Component displayName = meta.displayName();
-        Component displayNameHandled = handler.handleIfNotNull(audience, displayName);
+        Component displayNameHandled = itemHandler.handleIfNotNull(audience, displayName);
         List<Component> lore = meta.lore();
         PacketItemData data = new PacketItemData(displayName, lore);
         pdc.set(itemDataKey, DataType.ITEM_DATA, data);
@@ -65,11 +65,12 @@ public class ItemListener extends AbstractListener {
         if(itemStack.getType() == Material.WRITTEN_BOOK) {
             BookMeta bookMeta = (BookMeta) meta;
             List<Component> pages = bookMeta.pages();
-            Component title = displayNameHandled == null ? bookMeta.title() : displayNameHandled;
+            Component title = displayName == null ? bookMeta.title() : displayName;
             Component author = bookMeta.author();
             pdc.set(bookDataKey, DataType.BOOK_DATA, new PacketBookData(author, title, pages));
             bookMeta.title(handler.handleIfNotNull(audience, title));
             bookMeta.author(handler.handleIfNotNull(audience, author));
+
             for (int i = 1; i <= bookMeta.getPageCount(); i++) {
                 bookMeta.page(i, handler.handle(audience, bookMeta.page(i)));
             }

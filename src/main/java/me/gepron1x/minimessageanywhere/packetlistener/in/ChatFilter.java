@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ChatFilter extends PacketAdapter {
-    private static final Pattern TAG = Pattern.compile("(</?([#a-zA-Z\\d]+)>)");
+    private static final Pattern TAG = Pattern.compile("(</?([#:<>a-zA-Z\\d]+)>)");
     private final Predicate<Player> ignore;
     private final String replacement;
     private final String[] tokens;
@@ -40,9 +40,7 @@ public class ChatFilter extends PacketAdapter {
         Matcher matcher = TAG.matcher(message);
         while(matcher.find()) {
             String target = matcher.group(1);
-            String value = matcher.group(2);
-            plugin.getLogger().info(target);
-            plugin.getLogger().info(value);
+            String value = matcher.group(2).toLowerCase();
             for (String token : tokens) {
                 if (value.startsWith(token)) message = StringUtils.replace(message, target, replacement);
             }

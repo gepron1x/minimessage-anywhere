@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 
 public final class RegexUtils {
     public static final ImmutableSet<Character> METACHARACTERS =
-            ImmutableSet.of('.', '(', '[', '|', '{', '*', '+', '?', '^', '$', '/', '\\', '-');
+            ImmutableSet.of('.', '(', '[', '|', '{', '*', '+', '?', '^', '$', '\\', '-');
     private static final char BACKSLASH = '\\';
 
     private RegexUtils() {

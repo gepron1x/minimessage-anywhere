@@ -58,7 +58,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
 
 
     private ConfigManager<Config> configManager;
-    private final MiniMessage miniMessage = MiniMessage.get();
+    private final MiniMessage miniMessage = MiniMessage.miniMessage();
     private PaperCommandManager<CommandSender> commandManager;
     private GlobalComponentHandler handler;
     private MiniMessageComponentHandler miniComponentHandler;

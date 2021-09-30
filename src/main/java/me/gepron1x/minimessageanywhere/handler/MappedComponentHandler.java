@@ -9,7 +9,7 @@ import java.util.List;
 final class MappedComponentHandler implements ComponentHandler {
     private final List<ComponentHandler> handlers;
 
-    public MappedComponentHandler(List<ComponentHandler> handlers) {
+    MappedComponentHandler(List<ComponentHandler> handlers) {
         this.handlers = handlers;
     }
 
