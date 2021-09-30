@@ -3,7 +3,6 @@ package me.gepron1x.minimessageanywhere.handler;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 final class MappedComponentHandler implements ComponentHandler {
@@ -27,14 +26,4 @@ final class MappedComponentHandler implements ComponentHandler {
         return handlers;
     }
 
-    @Override
-    public ComponentHandler andThen(ComponentHandler handler) {
-        ArrayList<ComponentHandler> handlers = new ArrayList<>(this.handlers);
-        if (handler instanceof MappedComponentHandler) {
-            handlers.addAll(((MappedComponentHandler) handler).getHandlers());
-        } else {
-            handlers.add(handler);
-        }
-        return new MappedComponentHandler(handlers);
-    }
 }

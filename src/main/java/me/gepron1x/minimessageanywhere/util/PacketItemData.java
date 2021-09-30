@@ -13,15 +13,6 @@ public final class PacketItemData {
         this.displayName = displayName;
         this.lore = lore;
     }
-    public boolean hasLore() {
-        return lore != null;
-    }
-    public boolean hasDisplayName() {
-        return displayName != null;
-    }
-    public boolean isEmpty() {
-        return !hasLore() && hasDisplayName();
-    }
     @Nullable
     public Component getDisplayName() {
         return displayName;

@@ -26,7 +26,8 @@ import java.util.List;
 
 public class ItemListener extends AbstractListener {
 
-    private static final ComponentHandler DISABLE_ITALIC = (audience, component) -> component.decoration(TextDecoration.ITALIC, false);
+    private static final ComponentHandler DISABLE_ITALIC = (audience, component) ->
+            Component.text().decoration(TextDecoration.ITALIC, false).append(component).build();
 
     private final ComponentHandler itemHandler;
 
@@ -65,10 +66,13 @@ public class ItemListener extends AbstractListener {
         if(itemStack.getType() == Material.WRITTEN_BOOK) {
             BookMeta bookMeta = (BookMeta) meta;
             List<Component> pages = bookMeta.pages();
-            Component title = displayName == null ? bookMeta.title() : displayName;
+            Component title = bookMeta.title();
             Component author = bookMeta.author();
             pdc.set(bookDataKey, DataType.BOOK_DATA, new PacketBookData(author, title, pages));
+
+            //noinspection ResultOfMethodCallIgnored
             bookMeta.title(handler.handleIfNotNull(audience, title));
+            //noinspection ResultOfMethodCallIgnored
             bookMeta.author(handler.handleIfNotNull(audience, author));
 
             for (int i = 1; i <= bookMeta.getPageCount(); i++) {
@@ -111,8 +115,11 @@ public class ItemListener extends AbstractListener {
         PacketBookData bookData = pdc.get(bookDataKey, DataType.BOOK_DATA);
         if(itemStack.getType() == Material.WRITTEN_BOOK && bookData != null) {
             BookMeta book = (BookMeta) meta;
+            //noinspection ResultOfMethodCallIgnored
             book.pages(bookData.getPages());
+            //noinspection ResultOfMethodCallIgnored
             book.author(bookData.getAuthor());
+            //noinspection ResultOfMethodCallIgnored
             book.title(bookData.getTitle());
 
             pdc.remove(bookDataKey);

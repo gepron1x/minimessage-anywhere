@@ -15,6 +15,7 @@ import java.util.Collection;
  */
 @FunctionalInterface
 public interface ComponentHandler {
+    ComponentHandler IDENTITY = (a, c) -> c;
     /**
      * handles given component
      * @param audience - a receiver of the message
@@ -56,14 +57,7 @@ public interface ComponentHandler {
     }
 
     default ComponentHandler andThen(ComponentHandler handler) {
-        ArrayList<ComponentHandler> handlers = new ArrayList<>();
-        handlers.add(this);
-        if (handler instanceof MappedComponentHandler) {
-            handlers.addAll(((MappedComponentHandler) handler).getHandlers());
-        } else {
-            handlers.add(handler);
-        }
-        return new MappedComponentHandler(handlers);
+        return allOf(this, handler);
     }
 
     static ComponentHandler allOf(Collection<ComponentHandler> handlers) {
@@ -71,9 +65,10 @@ public interface ComponentHandler {
         for (ComponentHandler handler : handlers) {
             if (handler instanceof MappedComponentHandler) {
                 temp.addAll(((MappedComponentHandler) handler).getHandlers());
-            } else {
+            } else if (handler != IDENTITY) {
                 temp.add(handler);
             }
+
         }
         return new MappedComponentHandler(temp);
     }
