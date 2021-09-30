@@ -85,7 +85,7 @@ public class ItemListener extends AbstractListener {
     }
 
     private List<Component> processList(Audience audience, List<Component> components) {
-        List<Component> newList = new ArrayList<>(components);
+        List<Component> newList = new ArrayList<>(components.size());
         for(Component component : components) {
             newList.add(handler.handle(audience, component));
         }
