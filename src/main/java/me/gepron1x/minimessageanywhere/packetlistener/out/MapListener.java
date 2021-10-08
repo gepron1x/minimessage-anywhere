@@ -4,15 +4,15 @@ package me.gepron1x.minimessageanywhere.packetlistener.out;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
-import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
 import me.gepron1x.minimessageanywhere.wrapper.WrapperPlayServerMap;
+import org.bukkit.plugin.Plugin;
 
-import static me.gepron1x.minimessageanywhere.wrapper.WrapperPlayServerMap.*;
+import static me.gepron1x.minimessageanywhere.wrapper.WrapperPlayServerMap.MapIcon;
 
 
 public class MapListener extends AbstractListener {
 
-    public MapListener(MiniMessageAnywhere plugin, ComponentHandler handler) {
+    public MapListener(Plugin plugin, ComponentHandler handler) {
         super(plugin, handler, PacketType.Play.Server.MAP);
     }
 

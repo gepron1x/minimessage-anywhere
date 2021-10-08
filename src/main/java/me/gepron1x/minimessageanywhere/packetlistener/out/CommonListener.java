@@ -6,10 +6,10 @@ import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
-import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Collection;
 import java.util.function.UnaryOperator;
@@ -17,7 +17,7 @@ import java.util.function.UnaryOperator;
 
 public class CommonListener extends AbstractListener {
 
-    public CommonListener(MiniMessageAnywhere plugin, ComponentHandler handler, Collection<PacketType> types) {
+    public CommonListener(Plugin plugin, ComponentHandler handler, Collection<PacketType> types) {
         super(plugin, handler, types);
 
     }

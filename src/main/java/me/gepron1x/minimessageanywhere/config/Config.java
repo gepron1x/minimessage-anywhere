@@ -1,35 +1,54 @@
 package me.gepron1x.minimessageanywhere.config;
 
 import com.comphenix.protocol.PacketType;
+import com.google.common.collect.ImmutableList;
 import me.gepron1x.minimessageanywhere.util.Message;
+import me.gepron1x.minimessageanywhere.util.Versions;
 import space.arim.dazzleconf.annote.ConfComments;
 import space.arim.dazzleconf.annote.ConfKey;
 import space.arim.dazzleconf.annote.SubSection;
 
-import java.util.Collection;
+import java.util.List;
 
-import static space.arim.dazzleconf.annote.ConfDefault.*;
+import static space.arim.dazzleconf.annote.ConfDefault.DefaultBoolean;
+import static space.arim.dazzleconf.annote.ConfDefault.DefaultString;
 import static space.arim.dazzleconf.sorter.AnnotationBasedSorter.Order;
 
 public interface Config {
-    @Order(1)
-    @ConfComments({"Пакеты, которые будет обрабатывать плагин", "Не трогайте, если не знаете что делаете!"})
-    @DefaultStrings({
-            "KICK_DISCONNECT",
-            "BOSS",
-            "CHAT",
-            "OPEN_WINDOW",
-            "SCOREBOARD_OBJECTIVE",
-            "SCOREBOARD_TEAM",
-            "TITLE",
-            "PLAYER_LIST_HEADER_FOOTER"
-    })
-    @ConfKey("packets-to-listen")
-    Collection<PacketType> packetsToListen();
+    ImmutableList<PacketType> CAVES_AND_CLIFFS_TITLE = ImmutableList.of(
+            PacketType.Play.Server.SET_TITLE_TEXT, PacketType.Play.Server.SET_SUBTITLE_TEXT,
+            PacketType.Play.Server.SET_ACTION_BAR_TEXT
+    );
+    @SuppressWarnings("deprecation")
+    ImmutableList<PacketType> LEGACY_TITLE = ImmutableList.of(PacketType.Play.Server.TITLE);
+
 
     @Order(2)
     @ConfComments("специфичные пакеты, требующие индивидуальной обработки.")
     @SubSection Specific specific();
+
+    default List<PacketType> commonPacketTypes() {
+        ImmutableList.Builder<PacketType> builder = ImmutableList.builder();
+        Specific specific = specific();
+
+        if (specific.kickAndDisconnect()) builder.add(PacketType.Play.Server.KICK_DISCONNECT);
+
+        if (specific.bossBar()) builder.add(PacketType.Play.Server.BOSS);
+
+        if (specific.chat()) builder.add(PacketType.Play.Server.CHAT);
+
+        if (specific.inventoryTitles()) builder.add(PacketType.Play.Server.OPEN_WINDOW);
+
+        if (specific.scoreboard())
+            builder.add(PacketType.Play.Server.SCOREBOARD_TEAM, PacketType.Play.Server.SCOREBOARD_OBJECTIVE);
+
+        if (specific.tab()) builder.add(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
+
+        if (specific.titles()) builder.addAll(Versions.isCavesAndCliffs() ? CAVES_AND_CLIFFS_TITLE : LEGACY_TITLE);
+
+        return builder.build();
+
+    }
 
     interface Specific {
         @ConfComments("Обрабатывать предметы и книги?")
@@ -52,6 +71,36 @@ public interface Config {
 
         }
 
+        @ConfComments("Обрабатывать сообщения при кике / дисконнекте?")
+        @ConfKey("kick-disconnect")
+        @DefaultBoolean(true)
+        boolean kickAndDisconnect();
+
+        @ConfComments("Обрабатывать боссбар?")
+        @ConfKey("bossbar")
+        @DefaultBoolean(true)
+        boolean bossBar();
+
+        @ConfComments("Обрабатывать все сообщения в чате?")
+        @ConfKey("chat")
+        @DefaultBoolean(true)
+        boolean chat();
+
+        @ConfComments("Обрабатывать названия инвентарей?")
+        @ConfKey("inventory-titles")
+        @DefaultBoolean(true)
+        boolean inventoryTitles();
+
+        @ConfComments("Обрабатывать таблицу счета?")
+        @ConfKey("scoreboard")
+        @DefaultBoolean(true)
+        boolean scoreboard();
+
+        @ConfComments("Обрабатывать таб?")
+        @ConfKey("tab")
+        @DefaultBoolean(true)
+        boolean tab();
+
         @ConfComments("Обрабатывать имена энтити?")
         @ConfKey("entities")
         @DefaultBoolean(true)
@@ -64,11 +113,18 @@ public interface Config {
 
         @ConfComments("Обрабатывать имена игроков?")
         @ConfKey("player-info")
-        @DefaultBoolean(true) boolean playerInfo();
+        @DefaultBoolean(true)
+        boolean playerInfo();
 
         @ConfComments("Обрабатывать MOTD сервера?")
         @ConfKey("motd")
-        @DefaultBoolean(true) boolean MoTD();
+        @DefaultBoolean(true)
+        boolean MoTD();
+
+        @ConfComments("Обрабатывать тайтлы? (/title)")
+        @ConfKey("titles")
+        @DefaultBoolean(true)
+        boolean titles();
     }
 
     @Order(3)
@@ -94,18 +150,34 @@ public interface Config {
     }
 
     @Order(5)
-    @ConfComments("Фильтр чата. Игроки без права mmanywhere.ignore не смогут использовать minimessage в чате.")
+    @ConfComments("Фильтр чата. Игроки без права mmanywhere.ignore не смогут использовать форматтирование.")
     @ConfKey("filter-chat")
     @SubSection Filter filter();
 
     interface Filter {
 
-        @ConfKey("enabled")
-        @DefaultBoolean(false) boolean enabled();
+        @ConfComments("Фильтровать книги?")
+        @ConfKey("books")
+        @DefaultBoolean(true)
+        boolean books();
 
-        @ConfComments("Замена тега, если такой найдется. <red> -> <>")
-        @ConfKey("replacement")
-        @DefaultString("<>") String replacement();
+        @ConfComments("Фильтровать чат?")
+        @ConfKey("chat")
+        @DefaultBoolean(true)
+        boolean chat();
+
+        @ConfComments("Фильтровать переименованные в наковальне предметы?")
+        @ConfKey("anvil")
+        @DefaultBoolean(true)
+        boolean anvil();
+
+        default List<PacketType> common() {
+            ImmutableList.Builder<PacketType> builder = ImmutableList.builder();
+            if (chat()) builder.add(PacketType.Play.Client.CHAT);
+            if (anvil()) builder.add(PacketType.Play.Client.ITEM_NAME);
+            return builder.build();
+        }
+
 
     }
 

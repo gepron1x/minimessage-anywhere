@@ -7,6 +7,7 @@ import cloud.commandframework.exceptions.NoPermissionException;
 import cloud.commandframework.exceptions.NoSuchCommandException;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
+import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import me.gepron1x.minimessageanywhere.config.Config;
@@ -17,13 +18,15 @@ import me.gepron1x.minimessageanywhere.config.serializer.PacketTypeSerializer;
 import me.gepron1x.minimessageanywhere.handler.GlobalComponentHandler;
 import me.gepron1x.minimessageanywhere.handler.MiniMessageComponentHandler;
 import me.gepron1x.minimessageanywhere.listener.PrettyChatListener;
-import me.gepron1x.minimessageanywhere.packetlistener.in.ChatFilter;
+import me.gepron1x.minimessageanywhere.packetlistener.in.BookFilter;
+import me.gepron1x.minimessageanywhere.packetlistener.in.CommonFilter;
 import me.gepron1x.minimessageanywhere.packetlistener.out.*;
 import me.gepron1x.minimessageanywhere.processor.MiniMessageProcessor;
+import me.gepron1x.minimessageanywhere.util.MiniMessageTokenStripper;
 import me.gepron1x.minimessageanywhere.util.RegexUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Tokens;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -33,29 +36,18 @@ import space.arim.dazzleconf.sorter.AnnotationBasedSorter;
 
 import java.text.MessageFormat;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 
 
 public final class MiniMessageAnywhere extends JavaPlugin {
     private static final String NAME = "MiniMessageAnywhere";
-
-
-    private static final String[] MINI_MESSAGE_TOKENS = new String[]{
-            Tokens.CLICK, Tokens.HOVER, Tokens.KEYBIND,
-            Tokens.TRANSLATABLE, Tokens.TRANSLATABLE_2, Tokens.TRANSLATABLE_3,
-            Tokens.INSERTION, Tokens.COLOR, Tokens.COLOR_2,
-            Tokens.COLOR_3, Tokens.HEX, Tokens.FONT,
-            Tokens.UNDERLINED, Tokens.UNDERLINED_2, Tokens.STRIKETHROUGH,
-            Tokens.STRIKETHROUGH_2, Tokens.OBFUSCATED, Tokens.OBFUSCATED_2,
-            Tokens.ITALIC, Tokens.ITALIC_2, Tokens.ITALIC_3,
-            Tokens.BOLD, Tokens.BOLD_2, Tokens.RESET,
-            Tokens.RESET_2, Tokens.PRE, Tokens.GRADIENT
-    };
-
+    private static final Pattern EMPTY = Pattern.compile("((.+))");
 
     private ConfigManager<Config> configManager;
     private final MiniMessage miniMessage = MiniMessage.miniMessage();
@@ -68,7 +60,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
         protocolManager = ProtocolLibrary.getProtocolManager();
         handler = new GlobalComponentHandler();
         ConfigurationOptions options = new ConfigurationOptions.Builder()
-                .addSerialiser(new PacketTypeSerializer())
+                .addSerialiser(new PacketTypeSerializer(PacketType.Play.Server.getInstance()))
                 .addSerialiser(new MessageSerializer(miniMessage))
                 .sorter(new AnnotationBasedSorter())
                 .build();
@@ -94,7 +86,8 @@ public final class MiniMessageAnywhere extends JavaPlugin {
     private void enable() {
         configManager.reloadConfig();
         Config config = configManager.getConfigData();
-        MiniMessageProcessor processor = setupProcessor();
+        Pattern messagePattern = getMessagePattern();
+        MiniMessageProcessor processor = setupProcessor(messagePattern);
         miniComponentHandler = new MiniMessageComponentHandler(miniMessage, processor);
         handler.addHandler(miniComponentHandler);
         registerListeners();
@@ -102,36 +95,40 @@ public final class MiniMessageAnywhere extends JavaPlugin {
         setupCommand();
 
 
-        if(config.prettyChat()) {
+        if (config.prettyChat()) {
             getServer().getPluginManager().registerEvents(new PrettyChatListener(getServer(), handler), this);
         }
 
         Config.Filter filterConfig = config.filter();
-        if(filterConfig.enabled()) {
-            protocolManager.addPacketListener(new ChatFilter(
-                    this,
-                    MINI_MESSAGE_TOKENS,
-                    filterConfig.replacement(),
-                    player -> player.hasPermission(Permissions.IGNORE_FILTER)
-            ));
+
+        List<PacketType> commonFilters = filterConfig.common();
+        Predicate<Player> ignore = player -> player.hasPermission(Permissions.IGNORE_FILTER);
+        MiniMessageTokenStripper stripper = new MiniMessageTokenStripper(miniMessage, messagePattern);
+        if (!commonFilters.isEmpty()) {
+            protocolManager.addPacketListener(new CommonFilter(this, ignore, stripper));
+        }
+        if (filterConfig.books()) {
+            protocolManager.addPacketListener(new BookFilter(this, ignore, stripper));
         }
 
 
-
     }
-    private MiniMessageProcessor setupProcessor() {
+
+    private MiniMessageProcessor setupProcessor(Pattern messagePattern) {
+        if (messagePattern == EMPTY) return MiniMessageProcessor.all();
+        return MiniMessageProcessor.regex(messagePattern);
+    }
+
+    private Pattern getMessagePattern() {
         Config config = configManager.getConfigData();
-        MiniMessageProcessor processor;
-        if(config.parsingStrategy() == ParsingStrategy.ALL) {
-            processor = MiniMessageProcessor.all();
+        if (config.parsingStrategy() == ParsingStrategy.ALL) {
+            return EMPTY;
         } else {
             Config.Regex regexConfig = config.regex();
             String prefix = RegexUtils.adaptUserInput(regexConfig.prefix());
             String suffix = RegexUtils.adaptUserInput(regexConfig.suffix());
-            Pattern pattern = Pattern.compile(MessageFormat.format("{0}(.+){1}", prefix, suffix));
-            processor = MiniMessageProcessor.regex(pattern);
+            return Pattern.compile(MessageFormat.format("({0}(.+){1})", prefix, suffix));
         }
-        return processor;
     }
     private void registerListeners() {
         Config config = configManager.getConfigData();
@@ -139,7 +136,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
 
         Set<AbstractListener> listeners = new HashSet<>();
 
-        listeners.add(new CommonListener(this, handler, config.packetsToListen()));
+        listeners.add(new CommonListener(this, handler, config.commonPacketTypes()));
 
         Config.Specific specific = config.specific();
         Config.Specific.Items items = specific.items();
@@ -160,6 +157,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
             listeners.add(new ServerPingListener(this, handler));
         }
         listeners.forEach(protocolManager::addPacketListener);
+
     }
     private void setupCommand() {
         try {

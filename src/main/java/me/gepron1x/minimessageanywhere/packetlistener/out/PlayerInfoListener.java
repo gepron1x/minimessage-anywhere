@@ -5,14 +5,14 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.PlayerInfoData;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
-import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class PlayerInfoListener extends AbstractListener {
-    public PlayerInfoListener(MiniMessageAnywhere plugin, ComponentHandler handler) {
+    public PlayerInfoListener(Plugin plugin, ComponentHandler handler) {
         super(plugin, handler, PacketType.Play.Server.PLAYER_INFO);
     }
 

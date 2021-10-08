@@ -3,7 +3,6 @@ package me.gepron1x.minimessageanywhere.packetlistener.out;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.pdc.DataType;
 import me.gepron1x.minimessageanywhere.util.PacketBookData;
@@ -18,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class ItemListener extends AbstractListener {
     private final NamespacedKey itemDataKey, bookDataKey;
 
 
-    public ItemListener(MiniMessageAnywhere plugin, ComponentHandler handler, boolean disableItalic) {
+    public ItemListener(Plugin plugin, ComponentHandler handler, boolean disableItalic) {
         super(plugin,
                 handler,
                 PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS,

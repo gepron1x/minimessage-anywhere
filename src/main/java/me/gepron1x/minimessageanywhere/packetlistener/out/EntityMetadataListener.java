@@ -5,12 +5,14 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
+import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
+import org.bukkit.plugin.Plugin;
 
 import java.util.Optional;
 
-import static com.comphenix.protocol.wrappers.WrappedDataWatcher.*;
+import static com.comphenix.protocol.wrappers.WrappedDataWatcher.Registry;
+import static com.comphenix.protocol.wrappers.WrappedDataWatcher.WrappedDataWatcherObject;
 
 
 public class EntityMetadataListener extends AbstractListener {
@@ -18,11 +20,12 @@ public class EntityMetadataListener extends AbstractListener {
 
     private final WrappedDataWatcherObject customName;
 
-    public EntityMetadataListener(MiniMessageAnywhere plugin, ComponentHandler handler, int customNameIndex) {
+    public EntityMetadataListener(Plugin plugin, ComponentHandler handler, int customNameIndex) {
         super(plugin, handler, PacketType.Play.Server.ENTITY_METADATA);
         this.customName = new WrappedDataWatcherObject(customNameIndex, Registry.getChatComponentSerializer(true));
 
     }
+
     public EntityMetadataListener(MiniMessageAnywhere plugin, ComponentHandler handler) {
         this(plugin, handler, 2);
     }

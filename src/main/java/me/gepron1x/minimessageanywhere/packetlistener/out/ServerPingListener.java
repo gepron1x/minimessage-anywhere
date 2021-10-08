@@ -5,10 +5,10 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedServerPing;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
-import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
+import org.bukkit.plugin.Plugin;
 
 public class ServerPingListener extends AbstractListener {
-    public ServerPingListener(MiniMessageAnywhere plugin, ComponentHandler handler) {
+    public ServerPingListener(Plugin plugin, ComponentHandler handler) {
         super(plugin, handler, PacketType.Status.Server.SERVER_INFO);
     }
 
