@@ -4,7 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.google.common.base.Preconditions;
-import me.gepron1x.minimessageanywhere.util.MiniMessageTokenStripper;
+import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 
 public class BookFilter extends AbstractFilter {
 
-    public BookFilter(Plugin plugin, Predicate<Player> ignore, MiniMessageTokenStripper stripper) {
+    public BookFilter(Plugin plugin, Predicate<Player> ignore, MiniMessageEscaper stripper) {
         super(plugin, ignore, stripper, PacketType.Play.Client.B_EDIT);
     }
 
@@ -24,13 +24,13 @@ public class BookFilter extends AbstractFilter {
         PacketContainer packet = event.getPacket();
         @SuppressWarnings("unchecked") List<String> pages = packet.getSpecificModifier(List.class).read(0);
         List<String> newPages = new ArrayList<>(pages.size());
-        for (String page : pages) newPages.add(stripper.strip(page));
+        for (String page : pages) newPages.add(escape.escape(page));
 
         Optional<?> opt = packet.getSpecificModifier(Optional.class).read(0);
         opt.ifPresent(obj -> Preconditions.checkState(obj instanceof String, "optional does not contain a string"));
 
 
-        packet.getModifier().write(2, opt.map(String.class::cast).map(stripper::strip));
+        packet.getModifier().write(2, opt.map(String.class::cast).map(escape::escape));
 
         packet.getSpecificModifier(List.class).write(0, newPages);
         event.setPacket(packet);

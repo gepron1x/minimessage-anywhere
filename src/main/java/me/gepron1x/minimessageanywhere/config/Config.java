@@ -1,17 +1,24 @@
 package me.gepron1x.minimessageanywhere.config;
 
 import com.comphenix.protocol.PacketType;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import me.gepron1x.minimessageanywhere.util.Message;
 import me.gepron1x.minimessageanywhere.util.Versions;
+import net.kyori.adventure.text.minimessage.placeholder.PlaceholderResolver;
+import net.kyori.adventure.text.minimessage.placeholder.Replacement;
+import net.kyori.adventure.text.minimessage.transformation.TransformationRegistry;
+import net.kyori.adventure.text.minimessage.transformation.TransformationType;
 import space.arim.dazzleconf.annote.ConfComments;
 import space.arim.dazzleconf.annote.ConfKey;
 import space.arim.dazzleconf.annote.SubSection;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-import static space.arim.dazzleconf.annote.ConfDefault.DefaultBoolean;
-import static space.arim.dazzleconf.annote.ConfDefault.DefaultString;
+import static space.arim.dazzleconf.annote.ConfDefault.*;
 import static space.arim.dazzleconf.sorter.AnnotationBasedSorter.Order;
 
 public interface Config {
@@ -24,104 +31,96 @@ public interface Config {
 
 
     @Order(2)
-    @ConfComments("специфичные пакеты, требующие индивидуальной обработки.")
-    @SubSection Specific specific();
+    @ConfComments("What packets should we handle?")
+    @SubSection Config.ListenTo listenTo();
 
     default List<PacketType> commonPacketTypes() {
         ImmutableList.Builder<PacketType> builder = ImmutableList.builder();
-        Specific specific = specific();
+        ListenTo listenTo = listenTo();
 
-        if (specific.kickAndDisconnect()) builder.add(PacketType.Play.Server.KICK_DISCONNECT);
+        if (listenTo.kickAndDisconnect()) builder.add(PacketType.Play.Server.KICK_DISCONNECT);
 
-        if (specific.bossBar()) builder.add(PacketType.Play.Server.BOSS);
+        if (listenTo.bossBar()) builder.add(PacketType.Play.Server.BOSS);
 
-        if (specific.chat()) builder.add(PacketType.Play.Server.CHAT);
+        if (listenTo.chat()) builder.add(PacketType.Play.Server.CHAT);
 
-        if (specific.inventoryTitles()) builder.add(PacketType.Play.Server.OPEN_WINDOW);
+        if (listenTo.inventoryTitles()) builder.add(PacketType.Play.Server.OPEN_WINDOW);
 
-        if (specific.scoreboard())
+        if (listenTo.scoreboard())
             builder.add(PacketType.Play.Server.SCOREBOARD_TEAM, PacketType.Play.Server.SCOREBOARD_OBJECTIVE);
 
-        if (specific.tab()) builder.add(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
+        if (listenTo.tab()) builder.add(PacketType.Play.Server.PLAYER_LIST_HEADER_FOOTER);
 
-        if (specific.titles()) builder.addAll(Versions.isCavesAndCliffs() ? CAVES_AND_CLIFFS_TITLE : LEGACY_TITLE);
+        if (listenTo.titles()) builder.addAll(Versions.isCavesAndCliffs() ? CAVES_AND_CLIFFS_TITLE : LEGACY_TITLE);
 
         return builder.build();
 
     }
 
-    interface Specific {
-        @ConfComments("Обрабатывать предметы и книги?")
+    interface ListenTo {
+        @ConfComments("Should we handle items and books?")
         @ConfKey("items")
         @SubSection Items items();
 
         interface Items {
-            @ConfComments("Обрабатывать предметы и книги?")
             @ConfKey("enabled")
             @DefaultBoolean(true)
             boolean enabled();
 
             @ConfComments({
-                    "Отключает декорацию italic в названии и лоре предмета.",
-                    "Не знаю как вам, но меня это подбешивает :)",
-                    "P.S если вам оно нужно - можете просто добавить тег <i>, эта функция лишь отключает дефолтный курсив ванильного майнкрафта."})
+                    "Disables italic in name and lore of the item."})
             @ConfKey("disable-italic")
             @DefaultBoolean(false)
             boolean disableItalic();
 
         }
 
-        @ConfComments("Обрабатывать сообщения при кике / дисконнекте?")
+        @ConfComments("Should we handle kick/disconnect messages?")
         @ConfKey("kick-disconnect")
         @DefaultBoolean(true)
         boolean kickAndDisconnect();
 
-        @ConfComments("Обрабатывать боссбар?")
+        @ConfComments("Should we handle bossbars?")
         @ConfKey("bossbar")
         @DefaultBoolean(true)
         boolean bossBar();
 
-        @ConfComments("Обрабатывать все сообщения в чате?")
+        @ConfComments("Should we handle chat messages?")
         @ConfKey("chat")
         @DefaultBoolean(true)
         boolean chat();
 
-        @ConfComments("Обрабатывать названия инвентарей?")
+        @ConfComments("Should we handle inventory titles?")
         @ConfKey("inventory-titles")
         @DefaultBoolean(true)
         boolean inventoryTitles();
 
-        @ConfComments("Обрабатывать таблицу счета?")
+        @ConfComments("Should we handle scoreboard teams?")
         @ConfKey("scoreboard")
         @DefaultBoolean(true)
         boolean scoreboard();
 
-        @ConfComments("Обрабатывать таб?")
+        @ConfComments("Should we handle tab?")
         @ConfKey("tab")
         @DefaultBoolean(true)
         boolean tab();
 
-        @ConfComments("Обрабатывать имена энтити?")
+        @ConfComments("Should we handle entity nametags?")
         @ConfKey("entities")
         @DefaultBoolean(true)
         boolean entities();
 
-        @ConfComments("Обрабатывать иконки на картах?")
-        @ConfKey("map-icons")
-        @DefaultBoolean(true)
-        boolean mapIcons();
-
-        @ConfComments("Обрабатывать имена игроков?")
+        @ConfComments("Should we handle player names?")
         @ConfKey("player-info")
         @DefaultBoolean(true)
         boolean playerInfo();
 
-        @ConfComments("Обрабатывать MOTD сервера?")
+        @ConfComments("Shoudl we handle MoTD?")
         @ConfKey("motd")
         @DefaultBoolean(true)
         boolean MoTD();
 
-        @ConfComments("Обрабатывать тайтлы? (/title)")
+        @ConfComments("Should we handle titles? (/title)")
         @ConfKey("titles")
         @DefaultBoolean(true)
         boolean titles();
@@ -129,44 +128,45 @@ public interface Config {
 
     @Order(3)
     @ConfComments({
-            "Стратегия обработки. Возможные значения: ALL, REGEX",
-            "ALL - все сообщения будут обрабатываться",
-            "REGEX - обрабатываться будут только сообщения с префиксом и суффиксом, указанными ниже.",
-            "Например - такое: [mm]Hello <red> world[/mm]"})
+            "The parsing strategy. Possible values: ALL, REGEX",
+            "ALL - All messages, without regex check are going to be handled.",
+            "REGEX - Only prefixed & suffixed messages will be handled.",
+            "For example: [mm]Hello <red> world[/mm] will work."})
     @ConfKey("parsing-strategy")
     @DefaultString("REGEX")
     ParsingStrategy parsingStrategy();
 
     @Order(4)
-    @ConfComments("Настройки стратегии REGEX.")
+    @ConfComments("REGEX strategy options.")
     @SubSection Regex regex();
     interface Regex {
-        @ConfComments("Префикс.")
+        @ConfComments("Prefix.")
         @DefaultString("[mm]")
         String prefix();
-        @ConfComments("Суффикс.")
+
+        @ConfComments("Suffix.")
         @DefaultString("[/mm]")
         String suffix();
     }
 
     @Order(5)
-    @ConfComments("Фильтр чата. Игроки без права mmanywhere.ignore не смогут использовать форматтирование.")
+    @ConfComments("Chat filter. Players without mmanywhere.ignore wouldnt be able to use minimessage.")
     @ConfKey("filter-chat")
     @SubSection Filter filter();
 
     interface Filter {
 
-        @ConfComments("Фильтровать книги?")
+        @ConfComments("Should we filter books?")
         @ConfKey("books")
         @DefaultBoolean(true)
         boolean books();
 
-        @ConfComments("Фильтровать чат?")
+        @ConfComments("Should we filter chat?")
         @ConfKey("chat")
         @DefaultBoolean(true)
         boolean chat();
 
-        @ConfComments("Фильтровать переименованные в наковальне предметы?")
+        @ConfComments("Should we filter items renamed in anvil?")
         @ConfKey("anvil")
         @DefaultBoolean(true)
         boolean anvil();
@@ -182,14 +182,70 @@ public interface Config {
     }
 
     @Order(6)
-    @ConfComments("Красивый чат для консоли.")
+    @ConfComments("Should we parse messages using paper events? It is going to look fancy in console.")
     @ConfKey("pretty-chat")
-    @DefaultBoolean(true) boolean prettyChat();
-
+    @DefaultBoolean(true)
+    boolean prettyChat();
 
     @Order(7)
+    @ConfKey("minimessage-settings")
+    @SubSection MiniMessageSettings miniMessageSettings();
+
+    interface MiniMessageSettings {
+
+        ImmutableBiMap<String, TransformationType<?>> TRANSFORMATIONS =
+                new ImmutableBiMap.Builder<String, TransformationType<?>>()
+                        .put("COLOR", TransformationType.COLOR)
+                        .put("DECORATION", TransformationType.DECORATION)
+                        .put("HOVER_EVENT", TransformationType.HOVER_EVENT)
+                        .put("CLICK_EVENT", TransformationType.CLICK_EVENT)
+                        .put("KEYBIND", TransformationType.KEYBIND)
+                        .put("TRANSLATABLE", TransformationType.TRANSLATABLE)
+                        .put("INSERTION", TransformationType.INSERTION)
+                        .put("FONT", TransformationType.FONT)
+                        .put("GRADIENT", TransformationType.GRADIENT)
+                        .put("RAINBOW", TransformationType.RAINBOW)
+                        .build();
+
+        @ConfComments("Global placeholders.")
+        @ConfKey("placeholders")
+        @DefaultMap({"hello", "<red>world"})
+        Map<String, String> placeholders();
+
+        @ConfComments({"Allowed transformations. Possible values:",
+                "COLOR, DECORATION, HOVER_EVENT, CLICK_EVENT, KEYBIND",
+                "TRANSLATABLE, INSERTION, FONT, GRADIENT, RAINBOW.", "" +
+                "if you want to include all transformations, just use *."})
+        @DefaultStrings({"*"})
+        @ConfKey("transformations")
+        List<String> transformations();
+
+        default TransformationRegistry transformationRegistry() {
+            List<String> transformations = transformations();
+            if (transformations.size() == 1 && transformations.get(0).equals("*"))
+                return TransformationRegistry.standard();
+            TransformationRegistry.Builder builder = TransformationRegistry.builder().clear();
+            for (String s : transformations) {
+                builder.add(Objects.requireNonNull(TRANSFORMATIONS.get(s), () -> "Unknown transformation " + s));
+            }
+            return builder.build();
+        }
+
+        default PlaceholderResolver placeholderResolver() {
+            Map<String, String> placeholders = placeholders();
+            Map<String, Replacement<?>> map = new HashMap<>(placeholders.size());
+            placeholders.forEach((key, value) -> map.put(key, Replacement.miniMessage(value)));
+            return PlaceholderResolver.map(map);
+        }
+
+
+    }
+
+
+    @Order(8)
     @ConfKey("messages")
     @SubSection Messages messages();
+
     interface Messages {
 
         @ConfKey("info")
@@ -197,15 +253,15 @@ public interface Config {
         Message info();
 
         @ConfKey("no-permission")
-        @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> <#e60000>У вас нету права на это!")
+        @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> <#e60000>You dont have a permission to do this!")
         Message noPermission();
 
         @ConfKey("reloaded")
-        @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> Плагин успешно перезагружен!")
+        @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> Plugin reloaded successfully!")
         Message reloaded();
 
         @ConfKey("unknown-command")
-        @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> Неизвестная команда!")
+        @DefaultString("<gradient:#0073e6:#003cb3>MiniMessageAnywhere</gradient> <bold>|</bold> Unknown command!")
         Message unknownCommand();
 
     }

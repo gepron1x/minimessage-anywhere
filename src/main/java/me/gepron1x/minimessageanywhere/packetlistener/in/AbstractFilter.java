@@ -3,7 +3,7 @@ package me.gepron1x.minimessageanywhere.packetlistener.in;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
-import me.gepron1x.minimessageanywhere.util.MiniMessageTokenStripper;
+import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -11,12 +11,12 @@ import java.util.function.Predicate;
 
 public abstract class AbstractFilter extends PacketAdapter {
     private final Predicate<Player> ignore;
-    protected final MiniMessageTokenStripper stripper;
+    protected final MiniMessageEscaper escape;
 
-    protected AbstractFilter(Plugin plugin, Predicate<Player> ignore, MiniMessageTokenStripper stripper, PacketType... types) {
+    protected AbstractFilter(Plugin plugin, Predicate<Player> ignore, MiniMessageEscaper escape, PacketType... types) {
         super(plugin, types);
         this.ignore = ignore;
-        this.stripper = stripper;
+        this.escape = escape;
     }
 
     @Override

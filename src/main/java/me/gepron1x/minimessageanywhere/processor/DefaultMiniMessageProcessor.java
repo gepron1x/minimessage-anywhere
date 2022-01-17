@@ -8,6 +8,6 @@ public class DefaultMiniMessageProcessor implements MiniMessageProcessor {
     @Override
     public Component process(MiniMessage miniMessage, Component component) {
         String serialized = miniMessage.serialize(component);
-        return miniMessage.parse(serialized);
+        return miniMessage.deserialize(serialized);
     }
 }

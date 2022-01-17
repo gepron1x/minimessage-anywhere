@@ -4,7 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.reflect.StructureModifier;
-import me.gepron1x.minimessageanywhere.util.MiniMessageTokenStripper;
+import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -13,8 +13,8 @@ import java.util.function.Predicate;
 public class CommonFilter extends AbstractFilter {
 
 
-    public CommonFilter(Plugin plugin, Predicate<Player> ignore, MiniMessageTokenStripper stripper) {
-        super(plugin, ignore, stripper,
+    public CommonFilter(Plugin plugin, Predicate<Player> ignore, MiniMessageEscaper escape) {
+        super(plugin, ignore, escape,
                 PacketType.Play.Client.CHAT, PacketType.Play.Client.ITEM_NAME, PacketType.Play.Client.CLIENT_COMMAND);
     }
 
@@ -25,7 +25,7 @@ public class CommonFilter extends AbstractFilter {
         for (int i = 0; i < strings.size(); i++) {
             String value = strings.read(i);
             if (value == null) continue;
-            String result = stripper.strip(value);
+            String result = escape.escape(value);
             strings.write(i, result);
         }
         event.setPacket(container);

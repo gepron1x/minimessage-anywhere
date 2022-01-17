@@ -22,7 +22,7 @@ import me.gepron1x.minimessageanywhere.packetlistener.in.BookFilter;
 import me.gepron1x.minimessageanywhere.packetlistener.in.CommonFilter;
 import me.gepron1x.minimessageanywhere.packetlistener.out.*;
 import me.gepron1x.minimessageanywhere.processor.MiniMessageProcessor;
-import me.gepron1x.minimessageanywhere.util.MiniMessageTokenStripper;
+import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import me.gepron1x.minimessageanywhere.util.RegexUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
@@ -50,7 +50,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
     private static final Pattern EMPTY = Pattern.compile("((.+))");
 
     private ConfigManager<Config> configManager;
-    private final MiniMessage miniMessage = MiniMessage.miniMessage();
+    private MiniMessage miniMessage;
     private PaperCommandManager<CommandSender> commandManager;
     private GlobalComponentHandler handler;
     private MiniMessageComponentHandler miniComponentHandler;
@@ -61,17 +61,12 @@ public final class MiniMessageAnywhere extends JavaPlugin {
         handler = new GlobalComponentHandler();
         ConfigurationOptions options = new ConfigurationOptions.Builder()
                 .addSerialiser(new PacketTypeSerializer(PacketType.Play.Server.getInstance()))
-                .addSerialiser(new MessageSerializer(miniMessage))
+                .addSerialiser(new MessageSerializer(MiniMessage.miniMessage()))
                 .sorter(new AnnotationBasedSorter())
                 .build();
         configManager = ConfigManager.create(getDataFolder().toPath(), "config.yml", Config.class, options);
         enable();
-
-
-
         getLogger().info("Plugin successfully enabled.");
-
-
 
     }
 
@@ -86,6 +81,10 @@ public final class MiniMessageAnywhere extends JavaPlugin {
     private void enable() {
         configManager.reloadConfig();
         Config config = configManager.getConfigData();
+        miniMessage = MiniMessage.builder()
+                .transformations(config.miniMessageSettings().transformationRegistry())
+                .placeholderResolver(config.miniMessageSettings().placeholderResolver())
+                .build();
         Pattern messagePattern = getMessagePattern();
         MiniMessageProcessor processor = setupProcessor(messagePattern);
         miniComponentHandler = new MiniMessageComponentHandler(miniMessage, processor);
@@ -103,7 +102,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
 
         List<PacketType> commonFilters = filterConfig.common();
         Predicate<Player> ignore = player -> player.hasPermission(Permissions.IGNORE_FILTER);
-        MiniMessageTokenStripper stripper = new MiniMessageTokenStripper(miniMessage, messagePattern);
+        MiniMessageEscaper stripper = new MiniMessageEscaper(miniMessage);
         if (!commonFilters.isEmpty()) {
             protocolManager.addPacketListener(new CommonFilter(this, ignore, stripper));
         }
@@ -138,22 +137,19 @@ public final class MiniMessageAnywhere extends JavaPlugin {
 
         listeners.add(new CommonListener(this, handler, config.commonPacketTypes()));
 
-        Config.Specific specific = config.specific();
-        Config.Specific.Items items = specific.items();
+        Config.ListenTo listenTo = config.listenTo();
+        Config.ListenTo.Items items = listenTo.items();
 
         if (items.enabled()) {
             listeners.add(new ItemListener(this, handler, items.disableItalic()));
         }
-        if (specific.entities()) {
+        if (listenTo.entities()) {
             listeners.add(new EntityMetadataListener(this, handler));
         }
-        if (specific.mapIcons()) {
-            listeners.add(new MapListener(this, handler));
-        }
-        if (specific.playerInfo()) {
+        if (listenTo.playerInfo()) {
             listeners.add(new PlayerInfoListener(this, handler));
         }
-        if (specific.MoTD()) {
+        if (listenTo.MoTD()) {
             listeners.add(new ServerPingListener(this, handler));
         }
         listeners.forEach(protocolManager::addPacketListener);

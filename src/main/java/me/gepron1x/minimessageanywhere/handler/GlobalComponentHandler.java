@@ -54,6 +54,7 @@ public final class GlobalComponentHandler implements ComponentHandler {
      * @param handler - handler to remove
      * @return true if handler removed successfully, false otherwise.
      */
+
     public boolean removeHandler(ComponentHandler handler) {
         return entries.removeIf(entry -> entry.handler.equals(handler));
     }

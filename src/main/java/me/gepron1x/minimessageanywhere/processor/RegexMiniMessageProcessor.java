@@ -16,8 +16,8 @@ public class RegexMiniMessageProcessor implements MiniMessageProcessor {
     }
     @Override
     public Component process(final MiniMessage miniMessage, final Component component) {
-        TextReplacementConfig config = TextReplacementConfig.builder().match(pattern)
-                .replacement((result, builder) -> miniMessage.parse(result.group(1))).build();
+        TextReplacementConfig config = TextReplacementConfig.builder().match(pattern).times(1)
+                .replacement((result, builder) -> miniMessage.deserialize(result.group(2))).build();
         return component.replaceText(config);
     }
 
