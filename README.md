@@ -12,7 +12,7 @@ processing at protocol level. Take an advantage of translatable components, rgb 
 - Configurable transformations.
 
 See page on Paper's forum for more info and screenshots:
-<link>
+https://forums.papermc.io/threads/minimessageanywhere-rich-json-messages-anywhere.70/
 
 ### For developers
 
