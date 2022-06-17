@@ -18,11 +18,10 @@ final class MappedComponentHandler implements ComponentHandler {
         for (ComponentHandler handler : handlers) {
             component = handler.handle(audience, component);
         }
-
         return component;
     }
 
-    public List<ComponentHandler> getHandlers() {
+    public List<ComponentHandler> handlers() {
         return handlers;
     }
 

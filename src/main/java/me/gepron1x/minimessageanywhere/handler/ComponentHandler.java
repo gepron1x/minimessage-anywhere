@@ -64,7 +64,7 @@ public interface ComponentHandler {
         ArrayList<ComponentHandler> temp = new ArrayList<>();
         for (ComponentHandler handler : handlers) {
             if (handler instanceof MappedComponentHandler) {
-                temp.addAll(((MappedComponentHandler) handler).getHandlers());
+                temp.addAll(((MappedComponentHandler) handler).handlers());
             } else if (handler != IDENTITY) {
                 temp.add(handler);
             }

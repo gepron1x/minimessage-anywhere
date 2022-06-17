@@ -5,18 +5,17 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import me.gepron1x.minimessageanywhere.util.Message;
 import me.gepron1x.minimessageanywhere.util.Versions;
-import net.kyori.adventure.text.minimessage.placeholder.PlaceholderResolver;
-import net.kyori.adventure.text.minimessage.placeholder.Replacement;
-import net.kyori.adventure.text.minimessage.transformation.TransformationRegistry;
-import net.kyori.adventure.text.minimessage.transformation.TransformationType;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import space.arim.dazzleconf.annote.ConfComments;
 import space.arim.dazzleconf.annote.ConfKey;
 import space.arim.dazzleconf.annote.SubSection;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static space.arim.dazzleconf.annote.ConfDefault.*;
 import static space.arim.dazzleconf.sorter.AnnotationBasedSorter.Order;
@@ -193,18 +192,18 @@ public interface Config {
 
     interface MiniMessageSettings {
 
-        ImmutableBiMap<String, TransformationType<?>> TRANSFORMATIONS =
-                new ImmutableBiMap.Builder<String, TransformationType<?>>()
-                        .put("COLOR", TransformationType.COLOR)
-                        .put("DECORATION", TransformationType.DECORATION)
-                        .put("HOVER_EVENT", TransformationType.HOVER_EVENT)
-                        .put("CLICK_EVENT", TransformationType.CLICK_EVENT)
-                        .put("KEYBIND", TransformationType.KEYBIND)
-                        .put("TRANSLATABLE", TransformationType.TRANSLATABLE)
-                        .put("INSERTION", TransformationType.INSERTION)
-                        .put("FONT", TransformationType.FONT)
-                        .put("GRADIENT", TransformationType.GRADIENT)
-                        .put("RAINBOW", TransformationType.RAINBOW)
+        ImmutableBiMap<String, TagResolver> TRANSFORMATIONS =
+                new ImmutableBiMap.Builder<String, TagResolver>()
+                        .put("COLOR", StandardTags.color())
+                        .put("DECORATION", StandardTags.decorations())
+                        .put("HOVER_EVENT", StandardTags.hoverEvent())
+                        .put("CLICK_EVENT", StandardTags.clickEvent())
+                        .put("KEYBIND", StandardTags.keybind())
+                        .put("TRANSLATABLE", StandardTags.translatable())
+                        .put("INSERTION", StandardTags.insertion())
+                        .put("FONT", StandardTags.font())
+                        .put("GRADIENT", StandardTags.gradient())
+                        .put("RAINBOW", StandardTags.rainbow())
                         .build();
 
         @ConfComments("Global placeholders.")
@@ -220,22 +219,24 @@ public interface Config {
         @ConfKey("transformations")
         List<String> transformations();
 
-        default TransformationRegistry transformationRegistry() {
+        default TagResolver transformationRegistry() {
             List<String> transformations = transformations();
             if (transformations.size() == 1 && transformations.get(0).equals("*"))
-                return TransformationRegistry.standard();
-            TransformationRegistry.Builder builder = TransformationRegistry.builder().clear();
+                return TagResolver.standard();
+            TagResolver.Builder builder = TagResolver.builder();
             for (String s : transformations) {
-                builder.add(Objects.requireNonNull(TRANSFORMATIONS.get(s), () -> "Unknown transformation " + s));
+                builder.resolver(Objects.requireNonNull(TRANSFORMATIONS.get(s), () -> "Unknown transformation " + s));
             }
             return builder.build();
         }
 
-        default PlaceholderResolver placeholderResolver() {
+        default TagResolver placeholderResolver() {
             Map<String, String> placeholders = placeholders();
-            Map<String, Replacement<?>> map = new HashMap<>(placeholders.size());
-            placeholders.forEach((key, value) -> map.put(key, Replacement.miniMessage(value)));
-            return PlaceholderResolver.map(map);
+            return TagResolver.resolver(
+                    placeholders.entrySet().stream()
+                            .map(entry -> Placeholder.parsed(entry.getKey(), entry.getValue()))
+                            .collect(Collectors.toList())
+            );
         }
 
 

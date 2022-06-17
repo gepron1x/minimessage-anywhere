@@ -25,6 +25,7 @@ import me.gepron1x.minimessageanywhere.processor.MiniMessageProcessor;
 import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import me.gepron1x.minimessageanywhere.util.RegexUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -81,9 +82,12 @@ public final class MiniMessageAnywhere extends JavaPlugin {
     private void enable() {
         configManager.reloadConfig();
         Config config = configManager.getConfigData();
-        miniMessage = MiniMessage.builder()
-                .transformations(config.miniMessageSettings().transformationRegistry())
-                .placeholderResolver(config.miniMessageSettings().placeholderResolver())
+        miniMessage = MiniMessage.builder().tags(
+                        TagResolver.resolver(
+                                config.miniMessageSettings().placeholderResolver(),
+                                config.miniMessageSettings().transformationRegistry()
+                        )
+                )
                 .build();
         Pattern messagePattern = getMessagePattern();
         MiniMessageProcessor processor = setupProcessor(messagePattern);
