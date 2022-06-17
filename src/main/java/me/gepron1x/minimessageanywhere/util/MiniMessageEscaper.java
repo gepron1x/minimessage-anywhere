@@ -15,7 +15,7 @@ public final class MiniMessageEscaper {
 
 
     public String escape(String text) {
-        return miniMessage.escapeTokens(text);
+        return miniMessage.escapeTags(text);
     }
 
 
