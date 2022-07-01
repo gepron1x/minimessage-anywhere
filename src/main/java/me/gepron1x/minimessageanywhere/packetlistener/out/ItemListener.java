@@ -4,19 +4,12 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
-import me.gepron1x.minimessageanywhere.pdc.DataType;
-import me.gepron1x.minimessageanywhere.util.PacketBookData;
-import me.gepron1x.minimessageanywhere.util.PacketItemData;
+import me.gepron1x.minimessageanywhere.packetlistener.out.item.ConvertedItemStack;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +25,6 @@ public class ItemListener extends AbstractListener {
     private final ComponentHandler itemHandler;
 
 
-    private final NamespacedKey itemDataKey, bookDataKey;
 
 
     public ItemListener(Plugin plugin, ComponentHandler handler, boolean disableItalic) {
@@ -42,46 +34,12 @@ public class ItemListener extends AbstractListener {
                 PacketType.Play.Client.SET_CREATIVE_SLOT
         );
         this.itemHandler = disableItalic ? handler.andThen(DISABLE_ITALIC) : handler;
-        this.itemDataKey = new NamespacedKey(plugin, "item_data");
-        this.bookDataKey = new NamespacedKey(plugin, "book_data");
     }
 
     
     private void processItem(Audience audience, @Nullable ItemStack itemStack) {
-        if (itemStack == null || !itemStack.hasItemMeta()) return;
-        ItemMeta meta = itemStack.getItemMeta();
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-
-
-        Component displayName = meta.displayName();
-        Component displayNameHandled = itemHandler.handleIfNotNull(audience, displayName);
-        List<Component> lore = meta.lore();
-        PacketItemData data = new PacketItemData(displayName, lore);
-        pdc.set(itemDataKey, DataType.ITEM_DATA, data);
-
-        meta.displayName(displayNameHandled);
-        meta.lore(lore == null ? null : processList(audience, lore));
-
-
-        if(itemStack.getType() == Material.WRITTEN_BOOK) {
-            BookMeta bookMeta = (BookMeta) meta;
-            List<Component> pages = bookMeta.pages();
-            Component title = bookMeta.title();
-            Component author = bookMeta.author();
-            pdc.set(bookDataKey, DataType.BOOK_DATA, new PacketBookData(author, title, pages));
-
-            //noinspection ResultOfMethodCallIgnored
-            bookMeta.title(handler.handleIfNotNull(audience, title));
-            //noinspection ResultOfMethodCallIgnored
-            bookMeta.author(handler.handleIfNotNull(audience, author));
-
-            for (int i = 1; i <= bookMeta.getPageCount(); i++) {
-                bookMeta.page(i, handler.handle(audience, bookMeta.page(i)));
-            }
-        }
-
-
-        itemStack.setItemMeta(meta);
+        if (itemStack == null) return;
+        new ConvertedItemStack(this.itemHandler, audience, itemStack).convert();
     }
 
     private List<Component> processList(Audience audience, List<Component> components) {
@@ -97,35 +55,8 @@ public class ItemListener extends AbstractListener {
     public void onPacketReceiving(PacketEvent event) {
         PacketContainer packet = event.getPacket();
         ItemStack itemStack = packet.getItemModifier().read(0);
-        if(itemStack == null || !itemStack.hasItemMeta()) return;
-        ItemMeta meta = itemStack.getItemMeta();
-        PersistentDataContainer pdc = meta.getPersistentDataContainer();
-
-
-
-        PacketItemData itemData = pdc.get(itemDataKey, DataType.ITEM_DATA);
-
-        if(itemData != null) {
-            meta.displayName(itemData.getDisplayName());
-            meta.lore(itemData.getLore());
-            pdc.remove(itemDataKey);
-        }
-
-
-        PacketBookData bookData = pdc.get(bookDataKey, DataType.BOOK_DATA);
-        if(itemStack.getType() == Material.WRITTEN_BOOK && bookData != null) {
-            BookMeta book = (BookMeta) meta;
-            //noinspection ResultOfMethodCallIgnored
-            book.pages(bookData.getPages());
-            //noinspection ResultOfMethodCallIgnored
-            book.author(bookData.getAuthor());
-            //noinspection ResultOfMethodCallIgnored
-            book.title(bookData.getTitle());
-
-            pdc.remove(bookDataKey);
-        }
-
-        itemStack.setItemMeta(meta);
+        if (itemStack == null) return;
+        new ConvertedItemStack(itemHandler, event.getPlayer(), itemStack).revert();
         packet.getItemModifier().write(0, itemStack);
         event.setPacket(packet);
     }

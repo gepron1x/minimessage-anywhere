@@ -26,6 +26,7 @@ import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import me.gepron1x.minimessageanywhere.util.RegexUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -156,6 +157,9 @@ public final class MiniMessageAnywhere extends JavaPlugin {
         if (listenTo.MoTD()) {
             listeners.add(new ServerPingListener(this, handler));
         }
+        if (listenTo.itemFrames()) {
+            listeners.add(new ItemFrameListener(this, handler));
+        }
         listeners.forEach(protocolManager::addPacketListener);
 
     }
@@ -223,6 +227,7 @@ public final class MiniMessageAnywhere extends JavaPlugin {
 
     /**
      * a shortcut to easly get plugin from PluginManager
+     *
      * @param manager - manager to get plugin from
      * @return a minimessage anywhere plugin.
      */
@@ -230,6 +235,10 @@ public final class MiniMessageAnywhere extends JavaPlugin {
     public static MiniMessageAnywhere get(PluginManager manager) {
         return (MiniMessageAnywhere)
                 Objects.requireNonNull(manager.getPlugin(NAME), "MiniMessageAnywhere wasnt loaded!");
+    }
+
+    public static NamespacedKey key(String name) {
+        return new NamespacedKey(JavaPlugin.getPlugin(MiniMessageAnywhere.class), name);
     }
 
     @Override

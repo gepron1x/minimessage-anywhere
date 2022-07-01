@@ -20,6 +20,7 @@ public class EntityMetadataListener extends AbstractListener {
 
     private final WrappedDataWatcherObject customName;
 
+
     public EntityMetadataListener(Plugin plugin, ComponentHandler handler, int customNameIndex) {
         super(plugin, handler, PacketType.Play.Server.ENTITY_METADATA);
         this.customName = new WrappedDataWatcherObject(customNameIndex, Registry.getChatComponentSerializer(true));
@@ -44,7 +45,9 @@ public class EntityMetadataListener extends AbstractListener {
                 .map(WrappedChatComponent::getHandle)
         );
 
+
         packet.getWatchableCollectionModifier().write(0, wdw.getWatchableObjects());
         event.setPacket(packet);
     }
+
 }

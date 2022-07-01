@@ -42,10 +42,6 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>net.kyori.adventure.text.minimessage</pattern>
-                                    <shadedPattern>me.gepron1x.libraries.minimessage</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>space.arim.dazzleconf</pattern>
                                     <shadedPattern>me.gepron1x.libraries.dazzleconf</shadedPattern>
                                 </relocation>
