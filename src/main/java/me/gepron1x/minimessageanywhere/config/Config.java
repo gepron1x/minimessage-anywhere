@@ -76,7 +76,7 @@ public interface Config {
 
         @ConfComments("Should we handle item frames?")
         @ConfKey("item-frames")
-        @DefaultBoolean(false)
+        @DefaultBoolean(true)
         boolean itemFrames();
 
         @ConfComments("Should we handle kick/disconnect messages?")
