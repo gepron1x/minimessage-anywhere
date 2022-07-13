@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * A global component handler. here you can add your own handlers.
@@ -83,7 +84,21 @@ public final class GlobalComponentHandler implements ComponentHandler {
 
             this.priority = priority;
         }
+
         final ComponentHandler handler;
         final HandlerPriority priority;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            HandlerEntry that = (HandlerEntry) o;
+            return handler.equals(that.handler) && priority == that.priority;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(handler, priority);
+        }
     }
 }
