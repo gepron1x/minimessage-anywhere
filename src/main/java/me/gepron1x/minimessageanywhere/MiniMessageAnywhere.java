@@ -24,10 +24,8 @@ import me.gepron1x.minimessageanywhere.packetlistener.out.*;
 import me.gepron1x.minimessageanywhere.processor.MiniMessageProcessor;
 import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import me.gepron1x.minimessageanywhere.util.RegexUtils;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -90,10 +88,6 @@ public final class MiniMessageAnywhere extends JavaPlugin {
                 config.miniMessageSettings().placeholderResolver(),
                 config.miniMessageSettings().transformationRegistry()
         ));
-        if (config.parsingStrategy() == ParsingStrategy.ALL) builder.preProcessor(s -> {
-            Component component = LegacyComponentSerializer.legacyAmpersand().deserialize(s);
-            return miniMessage.serialize(component);
-        });
         this.miniMessage = builder.build();
         Pattern messagePattern = getMessagePattern();
         MiniMessageProcessor processor = setupProcessor(messagePattern);

@@ -44,7 +44,7 @@ public class EntityMetadataListener extends AbstractListener {
 
         wdw.setObject(customName,
                 ((Optional<?>) name)
-                        .map(WrappedChatComponent::fromHandle)
+                        .map(obj -> obj instanceof WrappedChatComponent c ? c : WrappedChatComponent.fromHandle(obj))
                         .map(c -> handler.handle(event.getPlayer(), c))
                         .map(WrappedChatComponent::getHandle)
         );
