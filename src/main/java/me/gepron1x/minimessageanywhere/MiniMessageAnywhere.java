@@ -26,6 +26,7 @@ import me.gepron1x.minimessageanywhere.util.MiniMessageEscaper;
 import me.gepron1x.minimessageanywhere.util.RegexUtils;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -88,6 +89,10 @@ public final class MiniMessageAnywhere extends JavaPlugin {
                 config.miniMessageSettings().placeholderResolver(),
                 config.miniMessageSettings().transformationRegistry()
         ));
+        builder.preProcessor(s -> {
+            if (s.indexOf(LegacyComponentSerializer.SECTION_CHAR) == -1) return s;
+            return this.miniMessage.serialize(LegacyComponentSerializer.legacySection().deserialize(s)).replace("\\<", "<");
+        });
         this.miniMessage = builder.build();
         Pattern messagePattern = getMessagePattern();
         MiniMessageProcessor processor = setupProcessor(messagePattern);
