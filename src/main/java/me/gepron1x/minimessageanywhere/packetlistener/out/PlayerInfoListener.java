@@ -22,7 +22,10 @@ public class PlayerInfoListener extends AbstractListener {
         List<PlayerInfoData> playerInfoDataList = packet.getPlayerInfoDataLists().read(0);
         List<PlayerInfoData> list = new ArrayList<>(playerInfoDataList.size());
         for (PlayerInfoData pid : playerInfoDataList) {
-
+            if (pid == null) {
+                list.add(null);
+                continue;
+            }
             PlayerInfoData playerInfoData = new PlayerInfoData(
                     pid.getProfile(),
                     pid.getLatency(),
