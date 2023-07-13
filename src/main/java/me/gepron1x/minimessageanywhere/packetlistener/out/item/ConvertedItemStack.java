@@ -16,6 +16,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class ConvertedItemStack {
 
@@ -43,11 +44,13 @@ public final class ConvertedItemStack {
         Component displayName = meta.displayName();
         Component displayNameHandled = this.handler.handleIfNotNull(audience, displayName);
         List<Component> lore = meta.lore();
+        List<Component> loreHandled = lore == null ? null : processList(audience, lore);
+        if (Objects.equals(displayName, displayNameHandled) && equals(lore, loreHandled)) return;
         PacketItemData data = new PacketItemData(displayName, lore);
         pdc.set(ITEM_DATA, DataType.ITEM_DATA, data);
 
         meta.displayName(displayNameHandled);
-        meta.lore(lore == null ? null : processList(audience, lore));
+        meta.lore(loreHandled);
 
 
         if (itemStack.getType() == Material.WRITTEN_BOOK) {
@@ -110,5 +113,15 @@ public final class ConvertedItemStack {
             newList.add(handler.handle(audience, component));
         }
         return newList;
+    }
+
+    private boolean equals(List<Component> a, List<Component> b) {
+        if (a == b) return true;
+        if (a == null || b == null) return false;
+        if (a.size() != b.size()) return false;
+        for (int i = 0; i < a.size(); i++) {
+            if (!a.get(i).equals(b.get(i))) return false;
+        }
+        return true;
     }
 }

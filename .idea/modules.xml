@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/minimessage-anywhere.iml" filepath="$PROJECT_DIR$/minimessage-anywhere.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MiniMessageAnywhere.iml" filepath="$PROJECT_DIR$/MiniMessageAnywhere.iml" />
     </modules>
   </component>
 </project>

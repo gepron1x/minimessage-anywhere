@@ -10,6 +10,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,8 +31,8 @@ public class ItemListener extends AbstractListener {
     public ItemListener(Plugin plugin, ComponentHandler handler, boolean disableItalic) {
         super(plugin,
                 handler,
-                PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS,
-                PacketType.Play.Client.SET_CREATIVE_SLOT
+                PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS, PacketType.Play.Server.OPEN_WINDOW_MERCHANT,
+                PacketType.Play.Client.SET_CREATIVE_SLOT, PacketType.Play.Client.WINDOW_CLICK
         );
         this.itemHandler = disableItalic ? handler.andThen(DISABLE_ITALIC) : handler;
     }
@@ -70,12 +71,27 @@ public class ItemListener extends AbstractListener {
             ItemStack item = packet.getItemModifier().read(0);
             processItem(player, item);
             packet.getItemModifier().write(0, item);
-        } else if(type == PacketType.Play.Server.WINDOW_ITEMS) {
+        } else if (type == PacketType.Play.Server.WINDOW_ITEMS) {
             List<ItemStack> items = packet.getItemListModifier().read(0);
-            for(ItemStack item : items) {
+            for (ItemStack item : items) {
                 processItem(player, item);
             }
             packet.getItemListModifier().write(0, items);
+            ItemStack cursor = packet.getItemModifier().readSafely(0);
+            if (cursor != null) {
+                processItem(player, cursor);
+                packet.getItemModifier().write(0, cursor);
+            }
+        } else if (type == PacketType.Play.Server.OPEN_WINDOW_MERCHANT) {
+            List<MerchantRecipe> recipes = packet.getMerchantRecipeLists().read(0).stream().peek(recipe -> {
+                recipe.setIngredients(recipe.getIngredients().stream().peek(i -> processItem(player, i)).toList());
+                processItem(player, recipe.getResult());
+            }).toList();
+            packet.getMerchantRecipeLists().write(0, recipes);
+        } else if (type == PacketType.Play.Client.WINDOW_CLICK) {
+            ItemStack i = packet.getItemModifier().read(0);
+            new ConvertedItemStack(itemHandler, event.getPlayer(), i).revert();
+            packet.getItemModifier().write(0, i);
         }
         event.setPacket(packet);
     }
