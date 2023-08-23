@@ -3,7 +3,6 @@ package me.gepron1x.minimessageanywhere.packetlistener.out;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import me.gepron1x.minimessageanywhere.packetlistener.out.item.ConvertedItemStack;
 import org.bukkit.inventory.ItemStack;
@@ -19,12 +18,14 @@ public final class ItemFrameListener extends AbstractListener {
     @Override
     public void onPacketSending(PacketEvent event) {
         final PacketContainer packet = event.getPacket();
-        final WrappedDataWatcher wdw = new WrappedDataWatcher(packet.getWatchableCollectionModifier().read(0));
-        if (!(wdw.getObject(8) instanceof ItemStack itemStack)) {
-            return;
-        }
-        new ConvertedItemStack(this.handler, event.getPlayer(), itemStack).convert();
-        wdw.setObject(8, itemStack);
+        var metadata = packet.getDataValueCollectionModifier().read(0);
+        metadata.forEach(value -> {
+            if (value.getValue() instanceof ItemStack item) {
+                new ConvertedItemStack(this.handler, event.getPlayer(), item).convert();
+                value.setValue(item);
+            }
+        });
+        packet.getDataValueCollectionModifier().write(0, metadata);
 
     }
 }
