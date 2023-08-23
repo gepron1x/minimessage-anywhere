@@ -4,8 +4,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
 import me.gepron1x.minimessageanywhere.MiniMessageAnywhere;
 import me.gepron1x.minimessageanywhere.handler.ComponentHandler;
 import org.bukkit.plugin.Plugin;
@@ -36,21 +35,15 @@ public class EntityMetadataListener extends AbstractListener {
     @Override
     public void onPacketSending(PacketEvent event) {
         final PacketContainer packet = event.getPacket();
-        List<WrappedWatchableObject> wwoList = packet.getWatchableCollectionModifier().read(0);
-        if (wwoList == null) return;
-        final WrappedDataWatcher wdw = new WrappedDataWatcher(wwoList);
-        Object name = wdw.getObject(customName);
-        if (name == null) return;
-
-        wdw.setObject(customName,
-                ((Optional<?>) name)
-                        .map(obj -> obj instanceof WrappedChatComponent c ? c : WrappedChatComponent.fromHandle(obj))
-                        .map(c -> handler.handle(event.getPlayer(), c))
-                        .map(WrappedChatComponent::getHandle)
-        );
-
-
-        packet.getWatchableCollectionModifier().write(0, wdw.getWatchableObjects());
+        List<WrappedDataValue> wwoList = packet.getDataValueCollectionModifier().read(0);
+        wwoList.forEach(value -> {
+            if (!value.getSerializer().isOptional()) return;
+            ((Optional<?>) value.getValue()).filter(WrappedChatComponent.class::isInstance)
+                    .ifPresent(o -> {
+                        value.setValue(handler.handle(event.getPlayer(), (WrappedChatComponent) o));
+                    });
+        });
+        packet.getDataValueCollectionModifier().write(0, wwoList);
         event.setPacket(packet);
     }
 
