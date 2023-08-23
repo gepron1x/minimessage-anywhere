@@ -19,7 +19,7 @@ public class PlayerInfoListener extends AbstractListener {
     @Override
     public void onPacketSending(PacketEvent event) {
         PacketContainer packet = event.getPacket();
-        List<PlayerInfoData> playerInfoDataList = packet.getPlayerInfoDataLists().read(0);
+        List<PlayerInfoData> playerInfoDataList = packet.getPlayerInfoDataLists().read(1);
         List<PlayerInfoData> list = new ArrayList<>(playerInfoDataList.size());
         for (PlayerInfoData pid : playerInfoDataList) {
             if (pid == null) {
@@ -34,7 +34,7 @@ public class PlayerInfoListener extends AbstractListener {
             );
             list.add(playerInfoData);
         }
-        packet.getPlayerInfoDataLists().write(0, list);
+        packet.getPlayerInfoDataLists().write(1, list);
         event.setPacket(packet);
 
     }
