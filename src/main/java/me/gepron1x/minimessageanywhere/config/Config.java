@@ -41,7 +41,7 @@ public interface Config {
 
         if (listenTo.bossBar()) builder.add(PacketType.Play.Server.BOSS);
 
-        if (listenTo.chat()) builder.add(PacketType.Play.Server.CHAT);
+        if (listenTo.chat()) builder.add(PacketType.Play.Server.CHAT).add(PacketType.Play.Server.SYSTEM_CHAT);
 
         if (listenTo.inventoryTitles()) builder.add(PacketType.Play.Server.OPEN_WINDOW);
 
